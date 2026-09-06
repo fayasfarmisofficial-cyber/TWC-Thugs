@@ -8,10 +8,8 @@ Covers:
   2. graph.py fallback parser safety with unformatted / garbage text
 """
 
-import pytest
 from amu.classify import classify_consumers
-from amu.graph import impact, capabilities
-
+from amu.graph import capabilities, impact
 
 # ===========================================================================
 # 1. Unknown bucket: dynamic dispatch & partial analysis routing

@@ -10,7 +10,6 @@ Commands:
 """
 
 import json
-import sys
 
 import typer
 

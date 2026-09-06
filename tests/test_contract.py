@@ -5,17 +5,13 @@ Tests for contract guardrail checks (FROZEN_SIGNATURE, OUT_OF_SCOPE, UNDECLARED_
 and safe fallback when the entire CLI is unavailable.
 """
 
-import pytest
 from amu.contract import (
-    ContractResult,
     Severity,
-    Violation,
     ViolationKind,
     _parse_diff,
     check_diff,
     run_contract_check,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers

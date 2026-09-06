@@ -10,11 +10,10 @@ Phases (per Track 2 safe-migration contract):
   4. Removal    – Delete / deprecate the original symbol
 """
 
-from graphlib import TopologicalSorter, CycleError
-from dataclasses import dataclass, field
-from typing import Dict, List, Set, Optional
 import json
-
+from dataclasses import dataclass, field
+from graphlib import CycleError, TopologicalSorter
+from typing import Dict, List, Optional, Set
 
 # ---------------------------------------------------------------------------
 # Data model

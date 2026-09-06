@@ -1,0 +1,30 @@
+amu/classify.py:1  function classify_consumers
+  signature: def classify_consumers(symbol: str, raw_impact_output: str, caps: dict) -> dict
+
+amu/classify.py:1-26 classify_consumers [function]
+   1→ def classify_consumers(symbol: str, raw_impact_output: str, caps: dict) -> dict:
+   2→     """
+   3→     Classifies consumers into will_break, might_break, and unknown.
+   4→     Satisfies Track 2 Curveball requirements by flagging unresolvable/partial analysis explicitly.
+   5→     """
+   6→     buckets = {
+   7→         "will_break": [],
+   8→         "might_break": [],
+   9→         "unknown": {
+  10→             "unresolved_callsites": 0,
+  11→             "dynamic_dispatch_sites": 0,
+  12→             "out_of_coverage": caps.get("out_of_coverage", []),
+  13→             "notes": ["Dynamic dispatch or reflection patterns treated as heuristic/incomplete."]
+  14→         }
+  15→     }
+  16→     
+  17→     lines = raw_impact_output.splitlines()
+  18→     for line in lines:
+  19→         if "hop: 1" in line or "direct" in line.lower():
+  20→             buckets["will_break"].append({"symbol": symbol, "reason": "Direct resolved caller"})
+  21→         elif "hop: 2" in line or "transitive" in line.lower():
+  22→             buckets["might_break"].append({"symbol": symbol, "reason": "Transitive hop-2 consumer"})
+  23→         elif "unresolved" in line.lower() or "dynamic" in line.lower():
+  24→             buckets["unknown"]["unresolved_callsites"] += 1
+  25→ 
+  26→     return buckets

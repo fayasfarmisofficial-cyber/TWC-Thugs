@@ -4,7 +4,8 @@ tests/test_plan.py
 Tests for topological plan generation (4-phase refactoring sequence).
 """
 
-import pytest
+import json
+
 from amu.plan import (
     PHASES,
     RefactoringPlan,
@@ -12,8 +13,6 @@ from amu.plan import (
     plan_from_buckets,
     plan_to_json,
 )
-import json
-
 
 # ---------------------------------------------------------------------------
 # Basic plan shape

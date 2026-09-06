@@ -20,11 +20,9 @@ from __future__ import annotations
 
 import json
 import subprocess
-import sys
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Dict, List, Optional
-
 
 # ---------------------------------------------------------------------------
 # Enums & constants

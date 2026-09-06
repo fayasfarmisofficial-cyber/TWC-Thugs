@@ -1,5 +1,6 @@
-import subprocess
 import json
+import subprocess
+
 
 def impact(symbol: str, depth: int = 2, repo: str = ".") -> str:
     """Runs entire graph impact and captures output.

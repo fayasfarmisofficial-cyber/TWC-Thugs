@@ -4,9 +4,7 @@ tests/test_classify.py
 Tests for the unknown bucket, safe fallback, and classify_consumers behaviour.
 """
 
-import pytest
 from amu.classify import classify_consumers
-
 
 # ---------------------------------------------------------------------------
 # Helpers

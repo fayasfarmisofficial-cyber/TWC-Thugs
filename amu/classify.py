@@ -13,7 +13,7 @@ def classify_consumers(symbol: str, raw_impact_output: str, caps: dict) -> dict:
             "notes": ["Dynamic dispatch or reflection patterns treated as heuristic/incomplete."]
         }
     }
-    
+
     lines = raw_impact_output.splitlines()
     for line in lines:
         if "hop: 1" in line or "direct" in line.lower():

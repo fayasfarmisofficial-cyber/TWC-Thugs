@@ -5,14 +5,30 @@ description = "Anti-Messup Agent – scope guardrail for AI code edits (TWC Buil
 requires-python = ">=3.11"
 dependencies = [
     "typer>=0.12",
+    "rich>=13.0",
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8.0", "pytest-cov"]
+dev = ["pytest>=8.0", "pytest-cov", "ruff", "anthropic", "mcp"]
 
 [project.scripts]
 amu = "amu.cli:app"
+entire-amu = "amu.cli:app"
 
 [build-system]
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["amu*"]
+
+[tool.setuptools.package-data]
+amu = ["skills/*/SKILL.md"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = ["E501"]
