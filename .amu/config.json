@@ -6,7 +6,7 @@
   "docs": {
     "mode": "draft"
   },
-  "model": "claude-sonnet-4-6",
+  "model": "claude-opus-5",
   "web": {
     "report_url": ""
   },
