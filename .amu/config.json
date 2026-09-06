@@ -1,0 +1,18 @@
+{
+  "language": "Python",
+  "test_cmd": "pytest -q",
+  "build_cmd": "python -m build",
+  "docs_dir": "docs",
+  "docs": {
+    "mode": "draft"
+  },
+  "model": "claude-sonnet-4-6",
+  "web": {
+    "report_url": ""
+  },
+  "languages": [],
+  "unparsed": [
+    "docs/evidence/00-capabilities.json",
+    "docs/evidence/01-search-classifier.json"
+  ]
+}

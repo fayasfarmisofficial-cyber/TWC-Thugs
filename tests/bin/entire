@@ -1,0 +1,2 @@
+#!/bin/sh
+exec "${PYTHON_FOR_FAKE:-python3}" "$(dirname "$0")/../fake_entire.py" "$@"

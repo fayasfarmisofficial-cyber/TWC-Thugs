@@ -1,0 +1,738 @@
+{
+  "root": {
+    "file": "amu/classify.py",
+    "exports": 3,
+    "internal": 0,
+    "feature": "Amu",
+    "feature_source": "map"
+  },
+  "change": "signature",
+  "depth": 2,
+  "nodes": [
+    {
+      "id": "n1",
+      "path": "amu/cli.py",
+      "symbol": "brief",
+      "confidence": "sound",
+      "risk": "will_break",
+      "feature": "Amu",
+      "order": 1,
+      "action": "edit",
+      "via": "CALLS:amu/cli.py:168",
+      "reason": "resolved CALLS edge at depth 1",
+      "verify": "amu verify --node n1",
+      "evidence": [
+        "impact:callers"
+      ]
+    },
+    {
+      "id": "n2",
+      "path": "amu/cli.py",
+      "symbol": "plan",
+      "confidence": "sound",
+      "risk": "will_break",
+      "feature": "Amu",
+      "order": 1,
+      "action": "edit",
+      "via": "CALLS:amu/cli.py:187",
+      "reason": "resolved CALLS edge at depth 1",
+      "verify": "amu verify --node n2",
+      "evidence": [
+        "impact:callers"
+      ]
+    },
+    {
+      "id": "n3",
+      "path": "tests/test_amu.py",
+      "symbol": "TestUnknownBucketRouting.test_dynamic_dispatch_line_increments_unresolved",
+      "confidence": "sound",
+      "risk": "will_break",
+      "feature": "Tests",
+      "order": 1,
+      "action": "edit",
+      "via": "CALLS:tests/test_amu.py:34",
+      "reason": "resolved CALLS edge at depth 1",
+      "verify": "pytest tests/test_amu.py::test_dynamic_dispatch_line_increments_unresolved",
+      "evidence": [
+        "impact:callers"
+      ]
+    },
+    {
+      "id": "n4",
+      "path": "tests/test_amu.py",
+      "symbol": "TestUnknownBucketRouting.test_multiple_dynamic_lines_all_counted",
+      "confidence": "sound",
+      "risk": "will_break",
+      "feature": "Tests",
+      "order": 1,
+      "action": "edit",
+      "via": "CALLS:tests/test_amu.py:43",
+      "reason": "resolved CALLS edge at depth 1",
+      "verify": "pytest tests/test_amu.py::test_multiple_dynamic_lines_all_counted",
+      "evidence": [
+        "impact:callers"
+      ]
+    },
+    {
+      "id": "n5",
+      "path": "tests/test_amu.py",
+      "symbol": "TestUnknownBucketRouting.test_dynamic_dispatch_not_in_will_break",
+      "confidence": "sound",
+      "risk": "will_break",
+      "feature": "Tests",
+      "order": 1,
+      "action": "edit",
+      "via": "CALLS:tests/test_amu.py:48",
+      "reason": "resolved CALLS edge at depth 1",
+      "verify": "pytest tests/test_amu.py::test_dynamic_dispatch_not_in_will_break",
+      "evidence": [
+        "impact:callers"
+      ]
+    },
+    {
+      "id": "n6",
+      "path": "tests/test_amu.py",
+      "symbol": "TestUnknownBucketRouting.test_dynamic_dispatch_not_in_might_break",
+      "confidence": "sound",
+      "risk": "will_break",
+      "feature": "Tests",
+      "order": 1,
+      "action": "edit",
+      "via": "CALLS:tests/test_amu.py:53",
+      "reason": "resolved CALLS edge at depth 1",
+      "verify": "pytest tests/test_amu.py::test_dynamic_dispatch_not_in_might_break",
+      "evidence": [
+        "impact:callers"
+      ]
+    },
+    {
+      "id": "n7",
+      "path": "tests/test_amu.py",
+      "symbol": "TestUnknownBucketRouting.test_unresolved_reference_routed_to_unknown",
+      "confidence": "sound",
+      "risk": "will_break",
+      "feature": "Tests",
+      "order": 1,
+      "action": "edit",
+      "via": "CALLS:tests/test_amu.py:60",
+      "reason": "resolved CALLS edge at depth 1",
+      "verify": "pytest tests/test_amu.py::test_unresolved_reference_routed_to_unknown",
+      "evidence": [
+        "impact:callers"
+      ]
+    },
+    {
+      "id": "n8",
+      "path": "tests/test_amu.py",
+      "symbol": "TestUnknownBucketRouting.test_partial_analysis_notes_always_present",
+      "confidence": "sound",
+      "risk": "will_break",
+      "feature": "Tests",
+      "order": 1,
+      "action": "edit",
+      "via": "CALLS:tests/test_amu.py:65",
+      "reason": "resolved CALLS edge at depth 1",
+      "verify": "pytest tests/test_amu.py::test_partial_analysis_notes_always_present",
+      "evidence": [
+        "impact:callers"
+      ]
+    },
+    {
+      "id": "n9",
+      "path": "tests/test_amu.py",
+      "symbol": "TestUnknownBucketRouting.test_out_of_coverage_modules_propagated_from_caps",
+      "confidence": "sound",
+      "risk": "will_break",
+      "feature": "Tests",
+      "order": 1,
+      "action": "edit",
+      "via": "CALLS:tests/test_amu.py:74",
+      "reason": "resolved CALLS edge at depth 1",
+      "verify": "pytest tests/test_amu.py::test_out_of_coverage_modules_propagated_from_caps",
+      "evidence": [
+        "impact:callers"
+      ]
+    },
+    {
+      "id": "n10",
+      "path": "tests/test_amu.py",
+      "symbol": "TestUnknownBucketRouting.test_mixed_output_routes_correctly",
+      "confidence": "sound",
+      "risk": "will_break",
+      "feature": "Tests",
+      "order": 1,
+      "action": "edit",
+      "via": "CALLS:tests/test_amu.py:86",
+      "reason": "resolved CALLS edge at depth 1",
+      "verify": "pytest tests/test_amu.py::test_mixed_output_routes_correctly",
+      "evidence": [
+        "impact:callers"
+      ]
+    },
+    {
+      "id": "n11",
+      "path": "tests/test_amu.py",
+      "symbol": "TestUnknownBucketRouting.test_unknown_bucket_zero_counts_on_clean_resolved_output",
+      "confidence": "sound",
+      "risk": "will_break",
+      "feature": "Tests",
+      "order": 1,
+      "action": "edit",
+      "via": "CALLS:tests/test_amu.py:94",
+      "reason": "resolved CALLS edge at depth 1",
+      "verify": "pytest tests/test_amu.py::test_unknown_bucket_zero_counts_on_clean_resolved_output",
+      "evidence": [
+        "impact:callers"
+      ]
+    },
+    {
+      "id": "n12",
+      "path": "tests/test_amu.py",
+      "symbol": "TestUnknownBucketRouting.test_unknown_bucket_structure_invariant",
+      "confidence": "sound",
+      "risk": "will_break",
+      "feature": "Tests",
+      "order": 1,
+      "action": "edit",
+      "via": "CALLS:tests/test_amu.py:100",
+      "reason": "resolved CALLS edge at depth 1",
+      "verify": "pytest tests/test_amu.py::test_unknown_bucket_structure_invariant",
+      "evidence": [
+        "impact:callers"
+      ]
+    },
+    {
+      "id": "n13",
+      "path": "tests/test_amu.py",
+      "symbol": "TestGraphFallbackSafety.test_impact_error_string_does_not_raise",
+      "confidence": "sound",
+      "risk": "will_break",
+      "feature": "Tests",
+      "order": 1,
+      "action": "edit",
+      "via": "CALLS:tests/test_amu.py:131",
+      "reason": "resolved CALLS edge at depth 1",
+      "verify": "pytest tests/test_amu.py::test_impact_error_string_does_not_raise",
+      "evidence": [
+        "impact:callers"
+      ]
+    },
+    {
+      "id": "n14",
+      "path": "tests/test_amu.py",
+      "symbol": "TestGraphFallbackSafety.test_impact_multiline_unformatted_output_safe",
+      "confidence": "sound",
+      "risk": "will_break",
+      "feature": "Tests",
+      "order": 1,
+      "action": "edit",
+      "via": "CALLS:tests/test_amu.py:153",
+      "reason": "resolved CALLS edge at depth 1",
+      "verify": "pytest tests/test_amu.py::test_impact_multiline_unformatted_output_safe",
+      "evidence": [
+        "impact:callers"
+      ]
+    },
+    {
+      "id": "n15",
+      "path": "tests/test_amu.py",
+      "symbol": "TestGraphFallbackSafety.test_capabilities_result_feeds_classify_without_error",
+      "confidence": "sound",
+      "risk": "will_break",
+      "feature": "Tests",
+      "order": 1,
+      "action": "edit",
+      "via": "CALLS:tests/test_amu.py:183",
+      "reason": "resolved CALLS edge at depth 1",
+      "verify": "pytest tests/test_amu.py::test_capabilities_result_feeds_classify_without_error",
+      "evidence": [
+        "impact:callers"
+      ]
+    },
+    {
+      "id": "n16",
+      "path": "tests/test_classify.py",
+      "symbol": "TestUnknownBucket.test_unknown_bucket_always_present",
+      "confidence": "sound",
+      "risk": "will_break",
+      "feature": "Tests",
+      "order": 1,
+      "action": "edit",
+      "via": "CALLS:tests/test_classify.py:31",
+      "reason": "resolved CALLS edge at depth 1",
+      "verify": "pytest tests/test_classify.py::test_unknown_bucket_always_present",
+      "evidence": [
+        "impact:callers"
+      ]
+    },
+    {
+      "id": "n17",
+      "path": "tests/test_classify.py",
+      "symbol": "TestUnknownBucket.test_unknown_bucket_has_required_keys",
+      "confidence": "sound",
+      "risk": "will_break",
+      "feature": "Tests",
+      "order": 1,
+      "action": "edit",
+      "via": "CALLS:tests/test_classify.py:35",
+      "reason": "resolved CALLS edge at depth 1",
+      "verify": "pytest tests/test_classify.py::test_unknown_bucket_has_required_keys",
+      "evidence": [
+        "impact:callers"
+      ]
+    },
+    {
+      "id": "n18",
+      "path": "tests/test_classify.py",
+      "symbol": "TestUnknownBucket.test_unknown_unresolved_callsites_increments",
+      "confidence": "sound",
+      "risk": "will_break",
+      "feature": "Tests",
+      "order": 1,
+      "action": "edit",
+      "via": "CALLS:tests/test_classify.py:44",
+      "reason": "resolved CALLS edge at depth 1",
+      "verify": "pytest tests/test_classify.py::test_unknown_unresolved_callsites_increments",
+      "evidence": [
+        "impact:callers"
+      ]
+    },
+    {
+      "id": "n19",
+      "path": "tests/test_classify.py",
+      "symbol": "TestUnknownBucket.test_unknown_out_of_coverage_propagated",
+      "confidence": "sound",
+      "risk": "will_break",
+      "feature": "Tests",
+      "order": 1,
+      "action": "edit",
+      "via": "CALLS:tests/test_classify.py:48",
+      "reason": "resolved CALLS edge at depth 1",
+      "verify": "pytest tests/test_classify.py::test_unknown_out_of_coverage_propagated",
+      "evidence": [
+        "impact:callers"
+      ]
+    },
+    {
+      "id": "n20",
+      "path": "tests/test_classify.py",
+      "symbol": "TestUnknownBucket.test_unknown_notes_non_empty",
+      "confidence": "sound",
+      "risk": "will_break",
+      "feature": "Tests",
+      "order": 1,
+      "action": "edit",
+      "via": "CALLS:tests/test_classify.py:53",
+      "reason": "resolved CALLS edge at depth 1",
+      "verify": "pytest tests/test_classify.py::test_unknown_notes_non_empty",
+      "evidence": [
+        "impact:callers"
+      ]
+    },
+    {
+      "id": "n21",
+      "path": "tests/test_classify.py",
+      "symbol": "TestUnknownBucket.test_unknown_counts_zero_on_clean_output",
+      "confidence": "sound",
+      "risk": "will_break",
+      "feature": "Tests",
+      "order": 1,
+      "action": "edit",
+      "via": "CALLS:tests/test_classify.py:58",
+      "reason": "resolved CALLS edge at depth 1",
+      "verify": "pytest tests/test_classify.py::test_unknown_counts_zero_on_clean_output",
+      "evidence": [
+        "impact:callers"
+      ]
+    },
+    {
+      "id": "n22",
+      "path": "tests/test_classify.py",
+      "symbol": "TestWillBreakMightBreak.test_direct_hop_classified_as_will_break",
+      "confidence": "sound",
+      "risk": "will_break",
+      "feature": "Tests",
+      "order": 1,
+      "action": "edit",
+      "via": "CALLS:tests/test_classify.py:69",
+      "reason": "resolved CALLS edge at depth 1",
+      "verify": "pytest tests/test_classify.py::test_direct_hop_classified_as_will_break",
+      "evidence": [
+        "impact:callers"
+      ]
+    },
+    {
+      "id": "n23",
+      "path": "tests/test_classify.py",
+      "symbol": "TestWillBreakMightBreak.test_transitive_hop_classified_as_might_break",
+      "confidence": "sound",
+      "risk": "will_break",
+      "feature": "Tests",
+      "order": 1,
+      "action": "edit",
+      "via": "CALLS:tests/test_classify.py:74",
+      "reason": "resolved CALLS edge at depth 1",
+      "verify": "pytest tests/test_classify.py::test_transitive_hop_classified_as_might_break",
+      "evidence": [
+        "impact:callers"
+      ]
+    },
+    {
+      "id": "n24",
+      "path": "tests/test_classify.py",
+      "symbol": "TestWillBreakMightBreak.test_direct_keyword_classified_as_will_break",
+      "confidence": "sound",
+      "risk": "will_break",
+      "feature": "Tests",
+      "order": 1,
+      "action": "edit",
+      "via": "CALLS:tests/test_classify.py:79",
+      "reason": "resolved CALLS edge at depth 1",
+      "verify": "pytest tests/test_classify.py::test_direct_keyword_classified_as_will_break",
+      "evidence": [
+        "impact:callers"
+      ]
+    },
+    {
+      "id": "n25",
+      "path": "tests/test_classify.py",
+      "symbol": "TestWillBreakMightBreak.test_transitive_keyword_classified_as_might_break",
+      "confidence": "sound",
+      "risk": "will_break",
+      "feature": "Tests",
+      "order": 1,
+      "action": "edit",
+      "via": "CALLS:tests/test_classify.py:84",
+      "reason": "resolved CALLS edge at depth 1",
+      "verify": "pytest tests/test_classify.py::test_transitive_keyword_classified_as_might_break",
+      "evidence": [
+        "impact:callers"
+      ]
+    },
+    {
+      "id": "n26",
+      "path": "tests/test_classify.py",
+      "symbol": "TestWillBreakMightBreak.test_empty_output_yields_empty_will_and_might",
+      "confidence": "sound",
+      "risk": "will_break",
+      "feature": "Tests",
+      "order": 1,
+      "action": "edit",
+      "via": "CALLS:tests/test_classify.py:88",
+      "reason": "resolved CALLS edge at depth 1",
+      "verify": "pytest tests/test_classify.py::test_empty_output_yields_empty_will_and_might",
+      "evidence": [
+        "impact:callers"
+      ]
+    },
+    {
+      "id": "n27",
+      "path": "tests/test_classify.py",
+      "symbol": "TestSafeFallback.test_empty_impact_output_does_not_raise",
+      "confidence": "sound",
+      "risk": "will_break",
+      "feature": "Tests",
+      "order": 1,
+      "action": "edit",
+      "via": "CALLS:tests/test_classify.py:100",
+      "reason": "resolved CALLS edge at depth 1",
+      "verify": "pytest tests/test_classify.py::test_empty_impact_output_does_not_raise",
+      "evidence": [
+        "impact:callers"
+      ]
+    },
+    {
+      "id": "n28",
+      "path": "tests/test_classify.py",
+      "symbol": "TestSafeFallback.test_garbage_impact_output_does_not_raise",
+      "confidence": "sound",
+      "risk": "will_break",
+      "feature": "Tests",
+      "order": 1,
+      "action": "edit",
+      "via": "CALLS:tests/test_classify.py:105",
+      "reason": "resolved CALLS edge at depth 1",
+      "verify": "pytest tests/test_classify.py::test_garbage_impact_output_does_not_raise",
+      "evidence": [
+        "impact:callers"
+      ]
+    },
+    {
+      "id": "n29",
+      "path": "tests/test_classify.py",
+      "symbol": "TestSafeFallback.test_error_prefixed_output_does_not_raise",
+      "confidence": "sound",
+      "risk": "will_break",
+      "feature": "Tests",
+      "order": 1,
+      "action": "edit",
+      "via": "CALLS:tests/test_classify.py:110",
+      "reason": "resolved CALLS edge at depth 1",
+      "verify": "pytest tests/test_classify.py::test_error_prefixed_output_does_not_raise",
+      "evidence": [
+        "impact:callers"
+      ]
+    },
+    {
+      "id": "n30",
+      "path": "tests/test_classify.py",
+      "symbol": "TestSafeFallback.test_empty_caps_does_not_raise",
+      "confidence": "sound",
+      "risk": "will_break",
+      "feature": "Tests",
+      "order": 1,
+      "action": "edit",
+      "via": "CALLS:tests/test_classify.py:114",
+      "reason": "resolved CALLS edge at depth 1",
+      "verify": "pytest tests/test_classify.py::test_empty_caps_does_not_raise",
+      "evidence": [
+        "impact:callers"
+      ]
+    },
+    {
+      "id": "n31",
+      "path": "amu/cli.py",
+      "symbol": "_repl",
+      "confidence": "sound",
+      "risk": "might_break",
+      "feature": "Amu",
+      "order": 2,
+      "action": "review",
+      "via": "CALLS:amu/cli.py:529",
+      "reason": "resolved CALLS edge at depth 2",
+      "verify": "amu verify --node n31",
+      "evidence": [
+        "impact:callers"
+      ]
+    },
+    {
+      "id": "n32",
+      "path": "amu/cli.py",
+      "symbol": "cli.py",
+      "confidence": "guessed",
+      "risk": "might_break",
+      "feature": "Amu",
+      "order": 3,
+      "action": "review",
+      "via": null,
+      "reason": "co-changes only, no resolved edge",
+      "verify": "amu verify --node n32",
+      "evidence": [
+        "impact:co_changes"
+      ]
+    },
+    {
+      "id": "n33",
+      "path": "amu/contract.py",
+      "symbol": "contract.py",
+      "confidence": "guessed",
+      "risk": "might_break",
+      "feature": "Amu",
+      "order": 3,
+      "action": "review",
+      "via": null,
+      "reason": "co-changes only, no resolved edge",
+      "verify": "amu verify --node n33",
+      "evidence": [
+        "impact:co_changes"
+      ]
+    },
+    {
+      "id": "n34",
+      "path": "amu/graph.py",
+      "symbol": "graph.py",
+      "confidence": "guessed",
+      "risk": "might_break",
+      "feature": "Amu",
+      "order": 3,
+      "action": "review",
+      "via": null,
+      "reason": "co-changes only, no resolved edge",
+      "verify": "amu verify --node n34",
+      "evidence": [
+        "impact:co_changes"
+      ]
+    },
+    {
+      "id": "n35",
+      "path": "amu/plan.py",
+      "symbol": "plan.py",
+      "confidence": "guessed",
+      "risk": "might_break",
+      "feature": "Amu",
+      "order": 3,
+      "action": "review",
+      "via": null,
+      "reason": "co-changes only, no resolved edge",
+      "verify": "amu verify --node n35",
+      "evidence": [
+        "impact:co_changes"
+      ]
+    },
+    {
+      "id": "n36",
+      "path": "pyproject.toml",
+      "symbol": "pyproject.toml",
+      "confidence": "guessed",
+      "risk": "might_break",
+      "feature": "Root (derived)",
+      "order": 3,
+      "action": "review",
+      "via": null,
+      "reason": "co-changes only, no resolved edge",
+      "verify": "amu verify --node n36",
+      "evidence": [
+        "impact:co_changes"
+      ]
+    },
+    {
+      "id": "n37",
+      "path": "tests/test_classify.py",
+      "symbol": "test_classify.py",
+      "confidence": "guessed",
+      "risk": "might_break",
+      "feature": "Tests",
+      "order": 3,
+      "action": "review",
+      "via": null,
+      "reason": "co-changes only, no resolved edge",
+      "verify": "pytest tests/test_classify.py::py",
+      "evidence": [
+        "impact:co_changes"
+      ]
+    },
+    {
+      "id": "n38",
+      "path": "tests/test_contract.py",
+      "symbol": "test_contract.py",
+      "confidence": "guessed",
+      "risk": "might_break",
+      "feature": "Tests",
+      "order": 3,
+      "action": "review",
+      "via": null,
+      "reason": "co-changes only, no resolved edge",
+      "verify": "pytest tests/test_contract.py::py",
+      "evidence": [
+        "impact:co_changes"
+      ]
+    },
+    {
+      "id": "n39",
+      "path": "tests/test_plan.py",
+      "symbol": "test_plan.py",
+      "confidence": "guessed",
+      "risk": "might_break",
+      "feature": "Tests",
+      "order": 3,
+      "action": "review",
+      "via": null,
+      "reason": "co-changes only, no resolved edge",
+      "verify": "pytest tests/test_plan.py::py",
+      "evidence": [
+        "impact:co_changes"
+      ]
+    },
+    {
+      "id": "n40",
+      "path": "amu/cli.py",
+      "symbol": "_do_map",
+      "confidence": "sound",
+      "risk": "will_break",
+      "feature": "Amu",
+      "order": 1,
+      "action": "edit",
+      "via": "CALLS:amu/cli.py:141",
+      "reason": "resolved CALLS edge at depth 1",
+      "verify": "amu verify --node n40",
+      "evidence": [
+        "impact:callers"
+      ]
+    },
+    {
+      "id": "n41",
+      "path": "amu/cli.py",
+      "symbol": "map",
+      "confidence": "sound",
+      "risk": "might_break",
+      "feature": "Amu",
+      "order": 2,
+      "action": "review",
+      "via": "CALLS:amu/cli.py:158",
+      "reason": "resolved CALLS edge at depth 2",
+      "verify": "amu verify --node n41",
+      "evidence": [
+        "impact:callers"
+      ]
+    },
+    {
+      "id": "n42",
+      "path": "amu/classify.py",
+      "symbol": "_feature_for",
+      "confidence": "sound",
+      "risk": "will_break",
+      "feature": "Amu",
+      "order": 1,
+      "action": "edit",
+      "via": "CALLS:depth1",
+      "reason": "resolved CALLS edge at depth 1",
+      "verify": "amu verify --node n42",
+      "evidence": [
+        "impact:callees"
+      ]
+    },
+    {
+      "id": "n43",
+      "path": "amu/classify.py",
+      "symbol": "_verify_for",
+      "confidence": "sound",
+      "risk": "will_break",
+      "feature": "Amu",
+      "order": 1,
+      "action": "edit",
+      "via": "CALLS:depth1",
+      "reason": "resolved CALLS edge at depth 1",
+      "verify": "amu verify --node n43",
+      "evidence": [
+        "impact:callees"
+      ]
+    },
+    {
+      "id": "n44",
+      "path": "amu/classify.py",
+      "symbol": "add",
+      "confidence": "guessed",
+      "risk": "might_break",
+      "feature": "Amu",
+      "order": 3,
+      "action": "review",
+      "via": null,
+      "reason": "siblings only, no resolved edge",
+      "verify": "amu verify --node n44",
+      "evidence": [
+        "impact:siblings"
+      ]
+    }
+  ],
+  "ripples": [],
+  "features": {
+    "Amu": 12,
+    "Tests": 31,
+    "Root (derived)": 1
+  },
+  "radius": {
+    "files": 10,
+    "packages": 3,
+    "exports": 3,
+    "consumers": 44,
+    "tests": 31
+  },
+  "resolution": {
+    "sound": 35,
+    "guessed": 9,
+    "unknown": 0,
+    "qualifier": "graph reported 0 unresolved sites at depth 2; dynamic dispatch and files outside parser coverage (none listed) are not counted"
+  },
+  "next": "amu plan --targets amu/classify.py#classify_consumers:signature --approve",
+  "map_hash": "95bfb40bbc70cb2d"
+}

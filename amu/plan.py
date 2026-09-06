@@ -199,3 +199,45 @@ def plan_from_buckets(symbol: str, buckets: dict) -> RefactoringPlan:
 
 def plan_to_json(plan: RefactoringPlan) -> str:
     return json.dumps(plan.to_dict(), indent=2)
+
+
+# ---------------------------------------------------------------------------
+# PRD phases from a map: additive → leaves → interior → removal
+# ---------------------------------------------------------------------------
+
+PRD_PHASES = ["additive", "leaves", "interior", "removal"]
+
+
+def plan_from_map(amu_map: dict, targets: list[dict]) -> list[dict]:
+    """Each phase lists node ids + files + tests + reason + verify. Deterministic, no ML."""
+    nodes = amu_map["nodes"]
+    root = amu_map["root"]["file"]
+    is_test = lambda p: p.rsplit("/", 1)[-1].startswith("test_") or p.startswith("tests/")  # noqa: E731
+    leaves = [n for n in nodes if n["confidence"] != "unknown" and is_test(n["path"])]
+    interior = [n for n in nodes if n["confidence"] != "unknown" and not is_test(n["path"])]
+    unknown = [n for n in nodes if n["confidence"] == "unknown"]
+    tests = sorted({n["path"] for n in leaves})
+    removal_needed = any(t["change_class"] in ("remove", "rename", "move", "signature") for t in targets)
+    phases = [
+        {"n": 1, "kind": "additive", "nodes": [], "files": [root], "tests": tests,
+         "reason": "introduce the new shape next to the old one; nothing breaks yet",
+         "verify": "amu check --phase 1"},
+        {"n": 2, "kind": "leaves", "nodes": [n["id"] for n in leaves], "files": sorted({n["path"] for n in leaves}), "tests": tests,
+         "reason": "migrate consumers with no dependants of their own (tests first)", "verify": "amu check --phase 2"},
+        {"n": 3, "kind": "interior", "nodes": [n["id"] for n in interior], "files": sorted({n["path"] for n in interior}), "tests": tests,
+         "reason": "migrate interior consumers in graph order; guessed nodes are reviewed, not assumed", "verify": "amu check --phase 3"},
+        {"n": 4, "kind": "removal", "nodes": [], "files": [root] if removal_needed else [], "tests": tests,
+         "reason": "remove the old shape only after phases 1-3 are green" if removal_needed else "no removal for a body change",
+         "verify": "amu check --phase 4"},
+    ]
+    for p in phases:
+        p["open_questions"] = [f"{u['id']} {u['path']}: {u['reason']} → {u['verify']}" for u in unknown]
+    return phases
+
+
+def make_contract(amu_map: dict, phases: list[dict], targets: list[dict], base_sha: str, created_at: str) -> dict:
+    files = sorted({f for p in phases for f in p["files"]})
+    frozen = [f"{n['path']}#{n['symbol']}" for n in amu_map["nodes"]
+              if n["confidence"] == "sound" and n["risk"] == "will_break" and n["symbol"]]
+    return {"targets": targets, "base_sha": base_sha, "map_hash": amu_map["map_hash"], "phases": phases,
+            "frozen_signatures": frozen, "allowed_files": files, "created_at": created_at}

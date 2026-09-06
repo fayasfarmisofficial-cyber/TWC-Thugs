@@ -1,0 +1,11 @@
+✓ Metadata branches: OK (no remote-tracking metadata ref found)
+
+✓ Git hooks: OK
+✓ Claude Code hook config: OK
+No stuck sessions found.
+--- explain
+  branch       main
+  checkpoints  0
+
+No checkpoints found on this branch.
+Checkpoints will appear here after you save changes during an agent session.

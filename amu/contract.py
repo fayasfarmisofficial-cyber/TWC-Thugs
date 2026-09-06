@@ -32,6 +32,9 @@ class ViolationKind(str, Enum):
     FROZEN_SIGNATURE   = "FROZEN_SIGNATURE"
     OUT_OF_SCOPE       = "OUT_OF_SCOPE"
     UNDECLARED_REMOVAL = "UNDECLARED_REMOVAL"
+    PHASE_DRIFT        = "PHASE_DRIFT"
+    UNGUARDED_CHANGE   = "UNGUARDED_CHANGE"
+    UNKNOWN_TOUCHED    = "UNKNOWN_TOUCHED"
 
 
 class Severity(str, Enum):
@@ -44,6 +47,9 @@ _DEFAULT_SEVERITY: Dict[ViolationKind, Severity] = {
     ViolationKind.FROZEN_SIGNATURE:   Severity.ERROR,
     ViolationKind.OUT_OF_SCOPE:       Severity.ERROR,
     ViolationKind.UNDECLARED_REMOVAL: Severity.ERROR,
+    ViolationKind.PHASE_DRIFT:        Severity.ERROR,
+    ViolationKind.UNGUARDED_CHANGE:   Severity.WARNING,
+    ViolationKind.UNKNOWN_TOUCHED:    Severity.WARNING,
 }
 
 
@@ -93,7 +99,7 @@ class ContractResult:
             lines.append("Warnings:")
             for w in self.warnings:
                 lines.append(f"  ℹ {w}")
-        status = "✔ PASSED" if self.passed else "✖ BLOCKED"
+        status = "0 blocking violations" if self.passed else "BLOCKED"
         lines.append(f"\nContract check: {status}")
         return "\n".join(lines)
 
@@ -156,9 +162,31 @@ def _parse_diff(diff_data: dict) -> List[dict]:
     }
     """
     raw_changes = diff_data.get("changes", [])
-    if not isinstance(raw_changes, list):
-        return []
-    return raw_changes
+    if isinstance(raw_changes, list) and raw_changes:
+        return raw_changes
+    if isinstance(diff_data.get("files"), list):
+        return parse_graph_diff(diff_data)
+    return []
+
+
+_TYPE_MAP = {"added": "added", "removed": "removed", "body_changed": "modified", "signature_changed": "modified",
+             "renamed": "removed", "moved": "modified"}
+
+
+def parse_graph_diff(diff_data: dict) -> List[dict]:
+    """Normalise the real entire-graph v0.4 shape `{files[{path,changes[{type,kind,name,...}]}]}` into flat records."""
+    out: List[dict] = []
+    for f in diff_data.get("files", []) or []:
+        for c in f.get("changes", []) or []:
+            t = c.get("type", "")
+            out.append({
+                "symbol": c.get("name", ""), "file": f.get("path", ""), "kind": c.get("kind", ""),
+                "change": _TYPE_MAP.get(t, "modified"), "type": t,
+                "signature_changed": t in ("signature_changed", "renamed"),
+                "dependents_count": c.get("dependents_count", 0),
+                "old_signature": c.get("old_signature"), "new_signature": c.get("new_signature"),
+            })
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -327,3 +355,50 @@ def run_contract_check(
         scope_symbols=scope_symbols,
         declared_removals=declared_removals,
     )
+
+
+# ---------------------------------------------------------------------------
+# PRD contract check: phase scope, drift, unknown nodes (pure – no subprocess)
+# ---------------------------------------------------------------------------
+
+def check_contract(contract: dict, changes: List[dict], changed_files: List[str], phase: Optional[int],
+                   unknown_files: Optional[set] = None, amu_files: Optional[set] = None) -> ContractResult:
+    """Blocking: FROZEN_SIGNATURE, OUT_OF_SCOPE, UNDECLARED_REMOVAL, PHASE_DRIFT. Warn: UNGUARDED_CHANGE, UNKNOWN_TOUCHED."""
+    unknown_files = unknown_files or set()
+    ignore = amu_files or set()
+    frozen = {f.split("#", 1)[-1] for f in contract.get("frozen_signatures", [])}
+    frozen_files = {f.split("#", 1)[0] for f in contract.get("frozen_signatures", [])}
+    phases = contract.get("phases", [])
+    allowed = set(contract.get("allowed_files", []))
+    phase_files = set()
+    later_files = set()
+    for p in phases:
+        if phase is None or p["n"] <= phase:
+            phase_files.update(p["files"])
+        else:
+            later_files.update(p["files"])
+    later_files -= phase_files
+    declared_removals = {t["symbol"].split("#")[-1] for t in contract.get("targets", []) if t.get("change_class") in ("remove", "rename", "move")}
+
+    violations: List[Violation] = []
+    for f in changed_files:
+        if f in ignore or f.startswith(".amu/") or f.startswith("docs/evidence/"):
+            continue
+        if f in later_files:
+            violations.append(Violation(ViolationKind.PHASE_DRIFT, f, f"changed in phase {phase} but belongs to a later phase", Severity.ERROR))
+        elif allowed and f not in allowed:
+            violations.append(Violation(ViolationKind.OUT_OF_SCOPE, f, "file is not in the contract's allowed_files", Severity.ERROR))
+        if f in unknown_files:
+            violations.append(Violation(ViolationKind.UNKNOWN_TOUCHED, f, "file is an unknown node; graph cannot see its consumers", Severity.WARNING))
+    for c in changes:
+        sym, file = c.get("symbol", ""), c.get("file", "")
+        if file in ignore:
+            continue
+        if c.get("signature_changed") and (sym in frozen or f"{file}#{sym}" in set(contract.get("frozen_signatures", []))) and file in frozen_files:
+            violations.append(Violation(ViolationKind.FROZEN_SIGNATURE, f"{file}#{sym}", "signature of a frozen consumer changed", Severity.ERROR))
+        if c.get("change") == "removed" and c.get("kind") in ("function", "class", "method") and not sym.split(".")[-1].startswith("_") and sym not in declared_removals:
+            violations.append(Violation(ViolationKind.UNDECLARED_REMOVAL, f"{file}#{sym}", "public symbol removed without a declared removal target", Severity.ERROR))
+        if c.get("type") in ("signature_changed", "body_changed") and file in allowed and not any(file in p["tests"] or p["tests"] for p in phases):
+            violations.append(Violation(ViolationKind.UNGUARDED_CHANGE, f"{file}#{sym}", "changed export has no test in the contract", Severity.WARNING))
+    has_errors = any(v.severity == Severity.ERROR for v in violations)
+    return ContractResult(passed=not has_errors, violations=violations, warnings=[])

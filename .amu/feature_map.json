@@ -1,0 +1,17 @@
+{
+  "Amu": [
+    "amu/**"
+  ],
+  "Amu.egg-info": [
+    "amu.egg-info/**"
+  ],
+  "Docs": [
+    "docs/**"
+  ],
+  "Scripts": [
+    "scripts/**"
+  ],
+  "Tests": [
+    "tests/**"
+  ]
+}

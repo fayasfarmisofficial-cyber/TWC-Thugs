@@ -1,0 +1,279 @@
+{
+  "phase": 1,
+  "base": "34f63246cb204332bc060b36ec576dbcd5cb7966",
+  "changed_files": [
+    ".amu/config.json",
+    ".amu/doc-map.json",
+    ".amu/feature_map.json",
+    ".amu/skills/conventions/SKILL.md",
+    ".amu/skills/run-tests/SKILL.md",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "amu/__init__.py",
+    "amu/__pycache__/__init__.cpython-313.pyc",
+    "amu/__pycache__/classify.cpython-313.pyc",
+    "amu/__pycache__/contract.cpython-313.pyc",
+    "amu/__pycache__/plan.cpython-313.pyc",
+    "amu/brand.py",
+    "amu/classify.py",
+    "amu/cli.py",
+    "amu/contract.py",
+    "amu/docs.py",
+    "amu/entire.py",
+    "amu/graph.py",
+    "amu/harness/model.py",
+    "amu/harness/orchestrator.py",
+    "amu/harness/prompts.py",
+    "amu/harness/roles.py",
+    "amu/mcp_server.py",
+    "amu/memory.py",
+    "amu/plan.py",
+    "amu/render.py",
+    "amu/router.py",
+    "amu/skills/close-the-loop/SKILL.md",
+    "amu/skills/doc-follow/SKILL.md",
+    "amu/skills/feature-rollup/SKILL.md",
+    "amu/skills/map-a-change/SKILL.md",
+    "amu/skills/memory-renovate/SKILL.md",
+    "amu/skills/phase-edit/SKILL.md",
+    "amu/skills/red-triage/SKILL.md",
+    "amu/skills/unknowns/SKILL.md",
+    "amu/state.py",
+    "docs/evidence/12-delta-brief.json",
+    "docs/evidence/checkpoint-diagnostic.txt",
+    "docs/evidence/checkpoints.jsonl",
+    "scripts/install.sh"
+  ],
+  "violations": [
+    {
+      "kind": "OUT_OF_SCOPE",
+      "symbol": "amu/__init__.py",
+      "detail": "file is not in the contract's allowed_files",
+      "severity": "ERROR"
+    },
+    {
+      "kind": "OUT_OF_SCOPE",
+      "symbol": "amu/__pycache__/__init__.cpython-313.pyc",
+      "detail": "file is not in the contract's allowed_files",
+      "severity": "ERROR"
+    },
+    {
+      "kind": "OUT_OF_SCOPE",
+      "symbol": "amu/__pycache__/classify.cpython-313.pyc",
+      "detail": "file is not in the contract's allowed_files",
+      "severity": "ERROR"
+    },
+    {
+      "kind": "OUT_OF_SCOPE",
+      "symbol": "amu/__pycache__/contract.cpython-313.pyc",
+      "detail": "file is not in the contract's allowed_files",
+      "severity": "ERROR"
+    },
+    {
+      "kind": "OUT_OF_SCOPE",
+      "symbol": "amu/__pycache__/plan.cpython-313.pyc",
+      "detail": "file is not in the contract's allowed_files",
+      "severity": "ERROR"
+    },
+    {
+      "kind": "OUT_OF_SCOPE",
+      "symbol": "amu/brand.py",
+      "detail": "file is not in the contract's allowed_files",
+      "severity": "ERROR"
+    },
+    {
+      "kind": "PHASE_DRIFT",
+      "symbol": "amu/cli.py",
+      "detail": "changed in phase 1 but belongs to a later phase",
+      "severity": "ERROR"
+    },
+    {
+      "kind": "PHASE_DRIFT",
+      "symbol": "amu/contract.py",
+      "detail": "changed in phase 1 but belongs to a later phase",
+      "severity": "ERROR"
+    },
+    {
+      "kind": "OUT_OF_SCOPE",
+      "symbol": "amu/docs.py",
+      "detail": "file is not in the contract's allowed_files",
+      "severity": "ERROR"
+    },
+    {
+      "kind": "OUT_OF_SCOPE",
+      "symbol": "amu/entire.py",
+      "detail": "file is not in the contract's allowed_files",
+      "severity": "ERROR"
+    },
+    {
+      "kind": "PHASE_DRIFT",
+      "symbol": "amu/graph.py",
+      "detail": "changed in phase 1 but belongs to a later phase",
+      "severity": "ERROR"
+    },
+    {
+      "kind": "OUT_OF_SCOPE",
+      "symbol": "amu/harness/model.py",
+      "detail": "file is not in the contract's allowed_files",
+      "severity": "ERROR"
+    },
+    {
+      "kind": "OUT_OF_SCOPE",
+      "symbol": "amu/harness/orchestrator.py",
+      "detail": "file is not in the contract's allowed_files",
+      "severity": "ERROR"
+    },
+    {
+      "kind": "OUT_OF_SCOPE",
+      "symbol": "amu/harness/prompts.py",
+      "detail": "file is not in the contract's allowed_files",
+      "severity": "ERROR"
+    },
+    {
+      "kind": "OUT_OF_SCOPE",
+      "symbol": "amu/harness/roles.py",
+      "detail": "file is not in the contract's allowed_files",
+      "severity": "ERROR"
+    },
+    {
+      "kind": "OUT_OF_SCOPE",
+      "symbol": "amu/mcp_server.py",
+      "detail": "file is not in the contract's allowed_files",
+      "severity": "ERROR"
+    },
+    {
+      "kind": "OUT_OF_SCOPE",
+      "symbol": "amu/memory.py",
+      "detail": "file is not in the contract's allowed_files",
+      "severity": "ERROR"
+    },
+    {
+      "kind": "PHASE_DRIFT",
+      "symbol": "amu/plan.py",
+      "detail": "changed in phase 1 but belongs to a later phase",
+      "severity": "ERROR"
+    },
+    {
+      "kind": "OUT_OF_SCOPE",
+      "symbol": "amu/render.py",
+      "detail": "file is not in the contract's allowed_files",
+      "severity": "ERROR"
+    },
+    {
+      "kind": "OUT_OF_SCOPE",
+      "symbol": "amu/router.py",
+      "detail": "file is not in the contract's allowed_files",
+      "severity": "ERROR"
+    },
+    {
+      "kind": "OUT_OF_SCOPE",
+      "symbol": "amu/skills/close-the-loop/SKILL.md",
+      "detail": "file is not in the contract's allowed_files",
+      "severity": "ERROR"
+    },
+    {
+      "kind": "OUT_OF_SCOPE",
+      "symbol": "amu/skills/doc-follow/SKILL.md",
+      "detail": "file is not in the contract's allowed_files",
+      "severity": "ERROR"
+    },
+    {
+      "kind": "OUT_OF_SCOPE",
+      "symbol": "amu/skills/feature-rollup/SKILL.md",
+      "detail": "file is not in the contract's allowed_files",
+      "severity": "ERROR"
+    },
+    {
+      "kind": "OUT_OF_SCOPE",
+      "symbol": "amu/skills/map-a-change/SKILL.md",
+      "detail": "file is not in the contract's allowed_files",
+      "severity": "ERROR"
+    },
+    {
+      "kind": "OUT_OF_SCOPE",
+      "symbol": "amu/skills/memory-renovate/SKILL.md",
+      "detail": "file is not in the contract's allowed_files",
+      "severity": "ERROR"
+    },
+    {
+      "kind": "OUT_OF_SCOPE",
+      "symbol": "amu/skills/phase-edit/SKILL.md",
+      "detail": "file is not in the contract's allowed_files",
+      "severity": "ERROR"
+    },
+    {
+      "kind": "OUT_OF_SCOPE",
+      "symbol": "amu/skills/red-triage/SKILL.md",
+      "detail": "file is not in the contract's allowed_files",
+      "severity": "ERROR"
+    },
+    {
+      "kind": "OUT_OF_SCOPE",
+      "symbol": "amu/skills/unknowns/SKILL.md",
+      "detail": "file is not in the contract's allowed_files",
+      "severity": "ERROR"
+    },
+    {
+      "kind": "OUT_OF_SCOPE",
+      "symbol": "amu/state.py",
+      "detail": "file is not in the contract's allowed_files",
+      "severity": "ERROR"
+    },
+    {
+      "kind": "OUT_OF_SCOPE",
+      "symbol": "scripts/install.sh",
+      "detail": "file is not in the contract's allowed_files",
+      "severity": "ERROR"
+    }
+  ],
+  "warnings": [],
+  "tests": null,
+  "passed": false,
+  "delta_brief": {
+    "node": "amu/__init__.py",
+    "consumers": [],
+    "why": "file is not in the contract's allowed_files",
+    "verify": "revert or re-plan, then amu check --phase 1"
+  },
+  "next": "fix the delta brief, then re-run",
+  "checker": {
+    "decision": "widen",
+    "confidence": 0.6,
+    "escalate": false,
+    "evidence": [
+      "amu/__init__.py",
+      "amu/__pycache__/__init__.cpython-313.pyc",
+      "amu/__pycache__/classify.cpython-313.pyc",
+      "amu/__pycache__/contract.cpython-313.pyc",
+      "amu/__pycache__/plan.cpython-313.pyc",
+      "amu/brand.py",
+      "amu/cli.py",
+      "amu/contract.py",
+      "amu/docs.py",
+      "amu/entire.py",
+      "amu/graph.py",
+      "amu/harness/model.py",
+      "amu/harness/orchestrator.py",
+      "amu/harness/prompts.py",
+      "amu/harness/roles.py",
+      "amu/mcp_server.py",
+      "amu/memory.py",
+      "amu/plan.py",
+      "amu/render.py",
+      "amu/router.py",
+      "amu/skills/close-the-loop/SKILL.md",
+      "amu/skills/doc-follow/SKILL.md",
+      "amu/skills/feature-rollup/SKILL.md",
+      "amu/skills/map-a-change/SKILL.md",
+      "amu/skills/memory-renovate/SKILL.md",
+      "amu/skills/phase-edit/SKILL.md",
+      "amu/skills/red-triage/SKILL.md",
+      "amu/skills/unknowns/SKILL.md",
+      "amu/state.py",
+      "scripts/install.sh"
+    ],
+    "next": "amu map --depth 2 then amu plan --approve",
+    "task": "t1",
+    "role": "checker"
+  }
+}

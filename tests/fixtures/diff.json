@@ -1,0 +1,8 @@
+{"base": "abc", "head": "HEAD", "files": [
+ {"path": "amu/classify.py", "status": "M", "language": "Python", "changes": [
+   {"type": "signature_changed", "kind": "function", "name": "classify_consumers", "old_signature": "def classify_consumers(symbol: str, raw_impact_output: str, caps: dict) -> dict", "new_signature": "def classify_consumers(symbol: str, raw_impact_output: str, caps: dict, depth: int = 2) -> dict", "dependents_count": 30}]},
+ {"path": "amu/plan.py", "status": "M", "language": "Python", "changes": [
+   {"type": "body_changed", "kind": "function", "name": "build_plan", "before_start_line": 90, "after_start_line": 90, "dependents_count": 4}]},
+ {"path": "amu/graph.py", "status": "M", "language": "Python", "changes": [
+   {"type": "removed", "kind": "function", "name": "capabilities", "dependents_count": 6}]}
+]}
