@@ -7,12 +7,14 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 from pathlib import Path
 
 import typer
 
-from amu import __version__, brand, entire, memory, render, router, state
+from amu import __version__, brand, entire, graphview, memory, render, router, state, workspace
 from amu import docs as docsmod
+from amu import watch as watchmod
 from amu.classify import build_map, classify_consumers
 from amu.contract import check_contract, parse_graph_diff, run_contract_check
 from amu.graph import capabilities, impact
@@ -27,7 +29,23 @@ app.add_typer(memory_app, name="memory")
 app.add_typer(skills_app, name="skills")
 
 JSON_OPT = typer.Option(False, "--json", help="machine-readable output (branding suppressed)")
-REPO_OPT = typer.Option(".", "--repo", help="repository path")
+_NO_REPO_NEEDED = {"doctor", "list", "run", "add", "use", "remove", "sync", "cd", None}
+
+
+def _resolve_repo_cb(ctx: typer.Context, value: str | None) -> str:
+    """--repo flag → repo containing $PWD → workspace active repo → error with the add hint."""
+    try:
+        return workspace.resolve(value)
+    except workspace.WorkspaceError as exc:
+        if ctx.command.name in _NO_REPO_NEEDED or ctx.resilient_parsing:
+            return value or "."
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(code=exc.code)
+
+
+REPO_OPT = typer.Option(None, "--repo", help="repository path (default: repo containing $PWD, else the active workspace repo)", callback=_resolve_repo_cb)
+repo_app = typer.Typer(help="workspace: add / list / use / remove / sync repos")
+app.add_typer(repo_app, name="repo")
 
 
 def _out(obj, json_mode: bool):
@@ -61,7 +79,7 @@ def main(ctx: typer.Context, version: bool = typer.Option(False, "--version", he
         typer.echo(f"amu {__version__} · TWC Thugs · entire {entire.version()} · entire-graph {entire.graph_version()}")
         raise typer.Exit()
     if ctx.invoked_subcommand is None:
-        _repl()
+        _repl(None)
 
 
 # ---------------------------------------------------------------------------
@@ -134,7 +152,14 @@ def _do_map(repo: str, file: str | None, symbol: str | None, depth: int, change:
         names = [s.get("qualified_name") or s["name"] for s in entire.symbols(repo)
                  if s.get("record_type", "symbol") == "symbol" and s.get("file_path") == file and s.get("kind") in ("function", "class")
                  and not s.get("name", "_").startswith("_")]
-    impacts = {n: entire.impact_json(repo, n, depth, file=(root_file if root_file != "?" else None)) for n in names}
+    impacts: dict[str, dict] = {}
+    with brand.progress("resolving…") as sp:
+        for n in names:
+            impacts[n] = entire.impact_json(repo, n, depth, file=(root_file if root_file != "?" else None))
+            edges = sum(((impacts[n].get(k) or {}).get("total") or 0) for k in ("callers", "callees", "type_consumers", "data_flows"))
+            sp.update(f"resolving callers of {n} · {edges} edges")
+    _nav_push(repo, "map", f"{root_file}#{names[0]}" if names else root_file)
+    workspace.touch(repo, last_map=root_file)
     if symbol and root_file == "?":
         f = impacts[names[0]].get("focus", {}).get("file_path")
         root_file = f or "?"
@@ -229,6 +254,7 @@ def check(phase: int = typer.Option(None, "--phase"), base_ref: str = typer.Opti
           head_ref: str = typer.Option("HEAD", "--head-ref", "--head"), frozen: str = typer.Option("", help="v0: comma-separated frozen symbols"),
           scope: str = typer.Option("", help="v0: comma-separated in-scope symbols"), removals: str = typer.Option("", help="v0: declared removals"),
           strict: bool = typer.Option(False, "--strict"), no_tests: bool = typer.Option(False, "--no-tests"),
+          no_live: bool = typer.Option(False, "--no-live", help="print the static tree instead of the live one"),
           repo: str = REPO_OPT, json_output: bool = JSON_OPT):
     """Contract check for a phase (or v0 --base/--head mode). Exit 1 on a blocking violation."""
     brand.header("check", state.repo_name(repo), json_output)
@@ -286,6 +312,8 @@ def check(phase: int = typer.Option(None, "--phase"), base_ref: str = typer.Opti
     out["checker"] = orch.on_check(out)
     _out(out, json_output)
     if not json_output:
+        with render.LiveTree(m, enabled=not no_live and sys.stdout.isatty()) as lt:
+            lt.update(st["nodes"])
         render.render_check(out)
         for w in warnings:
             typer.echo(f"  ℹ {w}")
@@ -427,6 +455,292 @@ def done(publish: bool = typer.Option(False, "--publish"), repo: str = REPO_OPT,
 
 
 # ---------------------------------------------------------------------------
+# workspace: repo add / list / use / remove / sync / cd
+# ---------------------------------------------------------------------------
+
+def _ws_fail(exc: workspace.WorkspaceError, json_output: bool):
+    typer.echo(json.dumps({"error": str(exc), "exit": exc.code}) if json_output else str(exc), err=not json_output)
+    raise typer.Exit(code=exc.code)
+
+
+@repo_app.command("add")
+def repo_add(spec: str = typer.Argument(..., help="local path, owner/repo, or GitHub URL"), branch: str = typer.Option(None, "--branch"),
+             depth: int = typer.Option(None, "--depth"), json_output: bool = JSON_OPT):
+    """Register a repo (clone if remote), index + snapshot it with entire graph, make it active."""
+    brand.header("repo add", spec, json_output)
+    if not (entire.available() and entire.graph_available()):
+        _need_entire(json_output)
+    try:
+        with brand.progress("cloning / indexing…"):
+            entry = workspace.add(spec, branch, depth)
+    except workspace.WorkspaceError as exc:
+        _ws_fail(exc, json_output)
+    _out(entry, json_output)
+    if not json_output:
+        c = entry["counts"]
+        typer.echo(f"active     {entry['name']} · {entry['branch']} · {c.get('files')} files · {c.get('symbols')} symbols · {c.get('relations')} relations")
+        typer.echo('next       amu map --file <path>   (or: amu find "what does X do")')
+
+
+@repo_app.command("list")
+def repo_list(json_output: bool = JSON_OPT):
+    ws = workspace.load()
+    rows = [{**r, "indexed_rel": workspace.relative(r.get("indexed_at", "")), "active": r["name"] == ws["active"]} for r in ws["repos"]]
+    _out({"active": ws["active"], "repos": rows}, json_output)
+    if not json_output:
+        brand.header("repo list", f"{len(rows)} repos", False)
+        render.render_repo_table(rows, ws["active"]) if rows else typer.echo("no repos yet — amu repo add <path|owner/repo>")
+
+
+@repo_app.command("use")
+def repo_use(name: str, json_output: bool = JSON_OPT):
+    try:
+        r = workspace.use(name)
+    except workspace.WorkspaceError as exc:
+        _ws_fail(exc, json_output)
+    _out(r, json_output)
+    brand.header("repo use", r["name"], json_output)
+
+
+@repo_app.command("remove")
+def repo_remove(name: str, delete_clone: bool = typer.Option(False, "--delete-clone", help="delete files only if the clone lives under ~/.amu/repos"), json_output: bool = JSON_OPT):
+    try:
+        r = workspace.remove(name, delete_clone)
+    except workspace.WorkspaceError as exc:
+        _ws_fail(exc, json_output)
+    _out(r, json_output)
+    if not json_output:
+        typer.echo(f"removed {r['name']} · clone {'deleted' if r['deleted_clone'] else 'kept'}")
+
+
+@repo_app.command("sync")
+def repo_sync(name: str = typer.Argument(None), all_repos: bool = typer.Option(False, "--all"), json_output: bool = JSON_OPT):
+    """git fetch + re-index + re-snapshot; entity-level changes via entire graph diff."""
+    ws = workspace.load()
+    names = [r["name"] for r in ws["repos"]] if all_repos else [name or ws["active"]]
+    out = []
+    for n in names:
+        if not n:
+            continue
+        try:
+            out.append(workspace.sync(n))
+        except workspace.WorkspaceError as exc:
+            _ws_fail(exc, json_output)
+    _out(out, json_output)
+    if not json_output:
+        for r in out:
+            typer.echo(f"{r['name']} · {r['old_sha'][:7]}→{r['sha'][:7]} · {r['files_changed']} files · {r['entity_changes']} entity changes")
+
+
+@app.command("cd")
+def cd_cmd(name: str):
+    """Print the repo path only, so `cd "$(amu cd <name>)"` works."""
+    r = workspace.get(name)
+    if not r:
+        typer.echo(f"no repo named {name}", err=True)
+        raise typer.Exit(code=2)
+    typer.echo(r["path"])
+
+
+# ---------------------------------------------------------------------------
+# in-repo navigation: find / open / tree / neighbors / where / back / recent
+# ---------------------------------------------------------------------------
+
+def _nav_push(repo: str, kind: str, target: str) -> None:
+    nav = state.read_json("nav.json", repo, default={"stack": []})
+    nav["stack"] = (nav["stack"] + [{"kind": kind, "target": target, "at": state.now_iso()}])[-20:]
+    state.write_json("nav.json", nav, repo)
+
+
+def _hits(sr: dict) -> list[dict]:
+    return [{"rank": r.get("rank"), "file_path": r.get("file_path"), "focus_line": r.get("focus_line") or r.get("start_line"),
+             "symbol_name": r.get("symbol_name") or r.get("qualified_name") or "", "kind": r.get("kind"), "signals": r.get("signals") or [],
+             "signature": r.get("signature")} for r in sr.get("results") or []]
+
+
+@app.command()
+def find(query: str, open_hit: str = typer.Option(None, "--open", help="print file:line of hit nN"), repo: str = REPO_OPT, json_output: bool = JSON_OPT):
+    """Ranked hits from `entire graph search`, each with the signals that ranked it."""
+    brand.header("find", state.repo_name(repo), json_output)
+    _need_entire(json_output)
+    sr = entire.search(repo, query)
+    hits = _hits(sr)
+    _nav_push(repo, "find", query)
+    if open_hit:
+        i = int(open_hit.lstrip("n")) - 1
+        if 0 <= i < len(hits):
+            typer.echo(f"{hits[i]['file_path']}:{hits[i]['focus_line']}")
+            return
+        typer.echo(f"no hit {open_hit}", err=True)
+        raise typer.Exit(code=2)
+    out = {"query": query, "hits": hits, "verify_command": sr.get("verify_command"), "coverage_note": sr.get("coverage_note"), "error": sr.get("error")}
+    _out(out, json_output)
+    if not json_output:
+        render.render_find(hits, query, sr.get("verify_command"))
+
+
+@app.command("open")
+def open_cmd(target: str, repo: str = REPO_OPT, json_output: bool = JSON_OPT):
+    """`entire graph def` for a symbol (or list a file's symbols), then the one-line next."""
+    brand.header("open", state.repo_name(repo), json_output)
+    _need_entire(json_output)
+    _nav_push(repo, "open", target)
+    if "/" in target and "#" not in target and Path(repo, target).exists():
+        syms = [s for s in entire.symbols(repo) if s.get("file_path") == target and s.get("record_type", "symbol") == "symbol"]
+        out = {"file": target, "symbols": [{"name": s.get("qualified_name"), "kind": s.get("kind"), "line": s.get("start_line"), "signature": s.get("signature")} for s in syms],
+               "next": f"amu map --file {target}"}
+        _out(out, json_output)
+        if not json_output:
+            for x in out["symbols"]:
+                typer.echo(f"  {x['line']:>5}  {x['kind']:<9} {x['signature'] or x['name']}")
+            typer.echo(f"next       {out['next']}")
+        return
+    name = target.split("#")[-1]
+    text = entire.definition(repo, name)
+    out = {"symbol": name, "definition": text, "next": f"amu map --symbol {target} --change signature"}
+    _out(out, json_output)
+    if not json_output:
+        typer.echo(text.rstrip())
+        typer.echo(f"next       {out['next']}")
+
+
+@app.command()
+def tree(path: str = typer.Argument("."), depth: int = typer.Option(2, "--depth"), repo: str = REPO_OPT, json_output: bool = JSON_OPT):
+    """Directory tree annotated with export counts and feature labels from feature_map.json."""
+    brand.header("tree", state.repo_name(repo), json_output)
+    root = Path(repo, path).resolve()
+    fm = state.read_json("feature_map.json", repo, default={})
+    counts: dict[str, int] = {}
+    if entire.available():
+        for s_ in entire.symbols(repo):
+            if s_.get("record_type", "symbol") == "symbol" and s_.get("kind") in ("function", "class") and not str(s_.get("name", "_")).startswith("_"):
+                counts[s_["file_path"]] = counts.get(s_["file_path"], 0) + 1
+    from amu.classify import _feature_for
+    rows = {}
+    for p in root.rglob("*"):
+        if p.is_file() and not any(seg in p.parts for seg in (".git", ".amu", "__pycache__", "node_modules")):
+            rel = str(p.relative_to(Path(repo).resolve()))
+            feat, src = _feature_for(rel, fm)
+            rows[str(p.relative_to(root))] = {"exports": counts.get(rel, 0), "feature": feat + ("" if src == "map" else " (derived)")}
+    _out({"root": str(root), "files": rows}, json_output)
+    if not json_output:
+        render.render_dir_tree(root, rows, depth)
+
+
+@app.command()
+def neighbors(symbol: str, relation: str = typer.Option("CALLS", "--relation"), direction: str = typer.Option("in", "--direction"),
+              repo: str = REPO_OPT, json_output: bool = JSON_OPT):
+    """Thin wrapper over `entire graph neighbors`."""
+    brand.header("neighbors", state.repo_name(repo), json_output)
+    _need_entire(json_output)
+    nb = entire.neighbors_json(repo, symbol.split("#")[-1], relation, direction)
+    _out(nb, json_output)
+    if not json_output:
+        for m_ in nb.get("matches") or []:
+            for e in m_.get("neighbors") or m_.get("entries") or []:
+                ep = e.get("endpoint") or e.get("symbol") or e
+                typer.echo(f"  {e.get('relation', relation)} {direction}  {ep.get('file_path')}#{ep.get('name')}")
+        typer.echo(f"matches    {len(nb.get('matches') or [])} · truncated {nb.get('truncated', False)}")
+
+
+@app.command()
+def where(symbol: str, repo: str = REPO_OPT, json_output: bool = JSON_OPT):
+    """Def site + the file's feature + whether it is frozen in the current contract."""
+    brand.header("where", state.repo_name(repo), json_output)
+    _need_entire(json_output)
+    name = symbol.split("#")[-1]
+    defs = [s_ for s_ in entire.symbols(repo) if s_.get("record_type", "symbol") == "symbol" and name in (s_.get("name"), s_.get("qualified_name"))]
+    if "#" in symbol:
+        defs = [d for d in defs if d.get("file_path") == symbol.split("#")[0]] or defs
+    contract = state.read_json("contract.json", repo, default={})
+    fm = state.read_json("feature_map.json", repo, default={})
+    from amu.classify import _feature_for
+    out = {"symbol": name, "status": "ok" if len(defs) == 1 else ("not_found" if not defs else "ambiguous"),
+           "definitions": [{"file": d.get("file_path"), "line": d.get("start_line"), "kind": d.get("kind"), "feature": _feature_for(d.get("file_path", ""), fm)[0],
+                            "frozen": f"{d.get('file_path')}#{d.get('qualified_name')}" in set(contract.get("frozen_signatures", []))} for d in defs]}
+    _out(out, json_output)
+    if not json_output:
+        for d in out["definitions"]:
+            typer.echo(f"  {d['file']}:{d['line']}  {d['kind']}  feature {d['feature']}  {'FROZEN in contract' if d['frozen'] else 'not frozen'}")
+        typer.echo(f"status     {out['status']}")
+
+
+@app.command()
+def back(repo: str = REPO_OPT, json_output: bool = JSON_OPT):
+    """Return to the previous navigation target (map / find / open) from .amu/nav.json."""
+    nav = state.read_json("nav.json", repo, default={"stack": []})
+    if len(nav["stack"]) < 2:
+        typer.echo("nothing to go back to", err=True)
+        raise typer.Exit(code=2)
+    nav["stack"].pop()
+    prev = nav["stack"][-1]
+    state.write_json("nav.json", nav, repo)
+    _out(prev, json_output)
+    if not json_output:
+        typer.echo(f"back to {prev['kind']} {prev['target']}")
+        if prev["kind"] == "map":
+            path, _, name = prev["target"].rpartition("#")
+            render.render_map(_do_map(repo, None if name else path, prev["target"] if name else None, 2, state.read_json("map.json", repo, default={}).get("change", "signature")))
+
+
+@app.command()
+def recent(repo: str = REPO_OPT, json_output: bool = JSON_OPT):
+    nav = state.read_json("nav.json", repo, default={"stack": []})
+    _out(nav["stack"], json_output)
+    if not json_output:
+        for i, e in enumerate(reversed(nav["stack"]), 1):
+            typer.echo(f"  {i:>2}  {e['kind']:<5} {e['target']}  [{e['at']}]")
+
+
+# ---------------------------------------------------------------------------
+# live rendering: graph / watch
+# ---------------------------------------------------------------------------
+
+@app.command()
+def graph(symbol: str, depth: int = typer.Option(2, "--depth"), relation: str = typer.Option(None, "--relation"),
+          fmt: str = typer.Option("text", "--format", help="text|json|dot|mermaid"), repo: str = REPO_OPT, json_output: bool = JSON_OPT):
+    """ASCII relation graph from `entire graph impact`; --format dot / mermaid for PR descriptions."""
+    if fmt == "json":
+        json_output = True
+    brand.header("graph", state.repo_name(repo), json_output or fmt in ("dot", "mermaid"))
+    _need_entire(json_output)
+    path, _, name = symbol.rpartition("#")
+    imp = entire.impact_json(repo, name, depth, file=path or None)
+    p = graphview.payload_from_impact(name, imp, relation)
+    if json_output:
+        typer.echo(json.dumps(p, indent=2))
+    elif fmt == "mermaid":
+        typer.echo(graphview.to_mermaid(p))
+    elif fmt == "dot":
+        typer.echo(graphview.to_dot(p))
+    else:
+        typer.echo(graphview.to_ascii(p))
+        if p["warnings"]:
+            typer.echo(f"warnings   {', '.join(p['warnings'])}")
+
+
+@app.command("watch")
+def watch_cmd(phase: int = typer.Option(None, "--phase"), no_live: bool = typer.Option(False, "--no-live"),
+              seconds: float = typer.Option(None, "--seconds", hidden=True), repo: str = REPO_OPT):
+    """Watch the working tree; update node states (▸ editing · ↯ drift) against the active contract. Never runs tests."""
+    brand.header("watch", state.repo_name(repo), False)
+    m = state.read_json("map.json", repo)
+    if not m:
+        typer.echo("no map yet — run amu map first", err=True)
+        raise typer.Exit(code=2)
+    st = state.read_json("state.json", repo, default={"nodes": {}})
+    with render.LiveTree(m, enabled=not no_live and sys.stdout.isatty()) as lt:
+        lt.update(st["nodes"])
+
+        def on_update(path, new_state, warnings):
+            lt.update(new_state["nodes"], warnings or [f"▸ {path}"])
+        try:
+            watchmod.run(repo, phase, on_update, stop_after=seconds)
+        except KeyboardInterrupt:
+            pass
+
+
+# ---------------------------------------------------------------------------
 # memory / skills / repl
 # ---------------------------------------------------------------------------
 
@@ -511,12 +825,45 @@ def skills_add(name: str, text: str = typer.Option("", "--text"), repo: str = RE
     typer.echo(f"wrote {d / 'SKILL.md'}")
 
 
-def _repl(repo: str = "."):
+def _completer(repo: str):
+    try:
+        from prompt_toolkit.completion import WordCompleter
+    except ImportError:
+        return None
+    words = list(router.SLASH) + [r["name"] for r in workspace.load()["repos"]]
+    snap = state.amu_dir(repo) / "snapshot.ndjson"
+    if snap.exists():
+        import re as _re
+        words += _re.findall(r'"name":"([A-Za-z_][A-Za-z0-9_.]*)"', snap.read_text()[:2_000_000])[:5000]
+    for n in state.read_json("map.json", repo, default={"nodes": []})["nodes"]:
+        words.append(n["id"])
+    return WordCompleter(sorted(set(words)), ignore_case=True)
+
+
+def _read_line(repo: str) -> str:
+    if sys.stdin.isatty():
+        try:
+            from prompt_toolkit import PromptSession
+            from prompt_toolkit.formatted_text import FormattedText
+            session = PromptSession(completer=_completer(repo))
+            return session.prompt(FormattedText([(brand.PALETTE["gold"], "twc-thugs "), (brand.PALETTE["amber"], "❯ ")]) if brand.color_enabled()
+                                  else brand.PROMPT)
+        except ImportError:
+            pass
+    return input(brand.PROMPT)
+
+
+def _repl(repo: str | None = None):
+    try:
+        repo = workspace.resolve(repo)
+    except workspace.WorkspaceError as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(code=exc.code)
     brand.banner(__version__, state.repo_name(repo), f"{'enabled' if entire.available() else 'missing'} · graph {entire.graph_version()}")
     lookup = _lookup_factory(repo)
     while True:
         try:
-            line = input(brand.PROMPT)
+            line = _read_line(repo)
         except (EOFError, KeyboardInterrupt):
             typer.echo("")
             return
@@ -525,19 +872,35 @@ def _repl(repo: str = "."):
         r = router.route(line, lookup)
         if r["status"] == "command":
             arg = r.get("arg", "")
-            cmds = {"map": lambda: _do_map(repo, arg, None, 2, "signature") and render.render_map(state.read_json("map.json", repo)),
+            cmds = {"map": lambda: render.render_map(_do_map(repo, arg, None, 2, "signature")),
                     "plan": lambda: plan(targets="", approve=False, symbol=None, repo=repo, json_output=False),
                     "approve": lambda: plan(targets="", approve=True, symbol=None, repo=repo, json_output=False),
-                    "check": lambda: check(phase=int(arg or 1), base_ref=None, head_ref="HEAD", frozen="", scope="", removals="", strict=False, no_tests=False, repo=repo, json_output=False),
+                    "check": lambda: check(phase=int(arg or 1), base_ref=None, head_ref="HEAD", frozen="", scope="", removals="", strict=False, no_tests=False, no_live=True, repo=repo, json_output=False),
                     "done": lambda: done(publish=False, repo=repo, json_output=False),
                     "docs": lambda: docs_cmd(mode=None, apply=None, repo=repo, json_output=False),
                     "verify": lambda: verify(node=arg, attempt_fallback=False, repo=repo, json_output=False),
                     "skills": lambda: skills_list(repo=repo, json_output=False),
                     "why": lambda: typer.echo(json.dumps(next((n for n in state.read_json("map.json", repo, default={"nodes": []})["nodes"] if n["id"] == arg), "no such node"), indent=2)),
                     "feature": lambda: typer.echo(json.dumps(state.read_json("feature_map.json", repo, default={}).get(arg, "unknown feature"))),
-                    "help": lambda: typer.echo("/map <file> /plan /approve /check N /done /docs /verify nX /why nX /feature X /skills — or describe the change in words")}
+                    "repo": lambda: repo_list(json_output=False),
+                    "use": lambda: repo_use(arg, json_output=False),
+                    "find": lambda: find(arg, open_hit=None, repo=repo, json_output=False),
+                    "open": lambda: open_cmd(arg, repo=repo, json_output=False),
+                    "tree": lambda: tree(arg or ".", depth=2, repo=repo, json_output=False),
+                    "back": lambda: back(repo=repo, json_output=False),
+                    "graph": lambda: graph(arg, depth=2, relation=None, fmt="text", repo=repo, json_output=False),
+                    "help": lambda: typer.echo("/map <file> /plan /approve /check N /done /docs /verify nX /why nX /feature X /skills /repo /use <name> /find <words> /open <sym> /tree [path] /graph <sym> /back — or describe the change in words")}
             try:
                 cmds.get(r["intent"], cmds["help"])()
+                if r["intent"] == "use" and workspace.get(arg):
+                    repo = workspace.get(arg)["path"]
+                    lookup = _lookup_factory(repo)
+            except typer.Exit:
+                pass
+            continue
+        if r["status"] == "explore":
+            try:
+                open_cmd(r["arg"], repo=repo, json_output=False)
             except typer.Exit:
                 pass
             continue
@@ -545,8 +908,7 @@ def _repl(repo: str = "."):
             t = r["targets"][0]
             typer.echo(f"→ amu map --symbol {t['path']}#{t['symbol']} --change {r['change_class']}")
             try:
-                m = _do_map(repo, None, f"{t['path']}#{t['symbol']}", 2, r["change_class"])
-                render.render_map(m)
+                render.render_map(_do_map(repo, None, f"{t['path']}#{t['symbol']}", 2, r["change_class"]))
             except typer.Exit:
                 pass
         else:
