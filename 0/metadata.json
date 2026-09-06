@@ -1,0 +1,107 @@
+{
+  "cli_version": "0.10.5",
+  "checkpoint_id": "01M1V10GC2XX677ECT1MBR27TJ",
+  "session_id": "d4f30598-d0b0-414e-bf84-640706b1a302",
+  "strategy": "manual-commit",
+  "created_at": "2026-09-06T09:32:54.271206Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "BUILD_PLAN.md",
+    "README.md",
+    "amu/brand.py",
+    "amu/graphview.py",
+    "amu/render.py",
+    "amu/router.py",
+    "amu/watch.py",
+    "amu/workspace.py",
+    "docs/ARCHITECTURE.md",
+    "pyproject.toml",
+    "tests/conftest.py",
+    "tests/fake_entire.py",
+    "tests/fixtures/search.json",
+    "tests/test_brand.py",
+    "tests/test_cli_smoke.py",
+    "tests/test_graph.py",
+    "tests/test_nav.py",
+    "tests/test_watch.py",
+    "tests/test_workspace.py",
+    "web/public/card.html",
+    "web/public/graph.html",
+    "web/public/index.html"
+  ],
+  "agent": "Claude Code",
+  "model": "claude-fable-5-1",
+  "turn_id": "d15c8ed51013",
+  "checkpoint_transcript_start": 441,
+  "transcript_lines_at_start": 441,
+  "compact_transcript_start": 77,
+  "token_usage": {
+    "input_tokens": 718,
+    "cache_creation_tokens": 63975,
+    "cache_read_tokens": 5930062,
+    "output_tokens": 51848,
+    "api_call_count": 23
+  },
+  "skill_events_version": 1,
+  "skill_events": [
+    {
+      "id": "claude-skill-toolu_017fmrjJuqY8stwYZ4xm7yLh",
+      "event_type": "tool_invocation",
+      "skill": {
+        "name": "run"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "skill_tool_use",
+        "confidence": "explicit"
+      },
+      "turn_id": "65ed61542efb",
+      "transcript_anchor": {
+        "unit": "line",
+        "start": 298,
+        "end": 299,
+        "entry_ids": [
+          "084db040-aac3-4dcc-bb13-3713618decf6"
+        ],
+        "tool_use_id": "toolu_017fmrjJuqY8stwYZ4xm7yLh"
+      },
+      "native": {
+        "tool_name": "Skill",
+        "tool_use_id": "toolu_017fmrjJuqY8stwYZ4xm7yLh"
+      },
+      "collapse": {
+        "target": "tool_pair",
+        "label": "Skill: run",
+        "default_collapsed": true
+      }
+    }
+  ],
+  "session_metrics": {
+    "turn_count": 4
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-09-06T09:32:54.159403Z",
+    "agent_lines": 1341,
+    "agent_removed": 54,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 1341,
+    "total_lines_changed": 1395,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 3,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".amu/skills/build/SKILL.md": 3
+      }
+    }
+  ]
+}

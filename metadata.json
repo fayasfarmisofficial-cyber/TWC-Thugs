@@ -1,0 +1,47 @@
+{
+  "cli_version": "0.10.5",
+  "checkpoint_id": "01M1V10GC2XX677ECT1MBR27TJ",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "BUILD_PLAN.md",
+    "README.md",
+    "amu/brand.py",
+    "amu/graphview.py",
+    "amu/render.py",
+    "amu/router.py",
+    "amu/watch.py",
+    "amu/workspace.py",
+    "docs/ARCHITECTURE.md",
+    "pyproject.toml",
+    "tests/conftest.py",
+    "tests/fake_entire.py",
+    "tests/fixtures/search.json",
+    "tests/test_brand.py",
+    "tests/test_cli_smoke.py",
+    "tests/test_graph.py",
+    "tests/test_nav.py",
+    "tests/test_watch.py",
+    "tests/test_workspace.py",
+    "web/public/card.html",
+    "web/public/graph.html",
+    "web/public/index.html"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 718,
+    "cache_creation_tokens": 63975,
+    "cache_read_tokens": 5930062,
+    "output_tokens": 51848,
+    "api_call_count": 23
+  }
+}
