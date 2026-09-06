@@ -27,6 +27,10 @@ def main(argv):
         print((FIX / "diff.json").read_text()); return 0
     if a[:2] == ["graph", "symbols"]:
         print((FIX / "symbols.ndjson").read_text()); return 0
+    if a[:2] == ["graph", "search"]:
+        print((FIX / "search.json").read_text()); return 0
+    if a[:2] == ["graph", "def"]:
+        print("amu/classify.py:1  function classify_consumers\n  signature: def classify_consumers(symbol: str, raw_impact_output: str, caps: dict) -> dict"); return 0
     if a[:2] == ["graph", "neighbors"]:
         print(json.dumps({"matches": [{"symbol": {"name": "x"}}]})); return 0
     if a[:2] == ["graph", "verify"]:

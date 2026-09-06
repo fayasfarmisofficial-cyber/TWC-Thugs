@@ -14,7 +14,9 @@ CLASS_RULES = [
     ("body", r"\b(body|implementation|fix|refactor internals|optimi[sz]e|bug)\b"),
 ]
 SLASH = {"/map": "map", "/plan": "plan", "/approve": "approve", "/check": "check", "/done": "done", "/docs": "docs",
-         "/verify": "verify", "/why": "why", "/feature": "feature", "/skills": "skills", "/help": "help"}
+         "/verify": "verify", "/why": "why", "/feature": "feature", "/skills": "skills", "/help": "help",
+         "/repo": "repo", "/use": "use", "/find": "find", "/open": "open", "/tree": "tree", "/back": "back", "/graph": "graph"}
+_EXPLORE_RX = re.compile(r"^[A-Za-z0-9_./#-]+$")
 
 
 def change_class(text: str) -> str:
@@ -40,6 +42,8 @@ def route(text: str, lookup: Callable[[str], list[dict]]) -> dict:
     if text.startswith("/"):
         cmd, _, arg = text.partition(" ")
         return {"intent": SLASH.get(cmd, "unknown"), "arg": arg.strip(), "status": "command", "targets": [], "change_class": None}
+    if " " not in text and _EXPLORE_RX.match(text) and ("/" in text or "#" in text or "." in text):
+        return {"intent": "explore", "arg": text, "status": "explore", "targets": [], "change_class": None}
     cls = change_class(text)
     found: list[dict] = []
     ambiguous: list[str] = []

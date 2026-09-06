@@ -28,6 +28,7 @@ def test_map_requires_target(tmp_path):
 
 
 def test_map_with_fake_entire(fake_entire, tmp_path):
+    subprocess.run(["git", "init", "-q"], cwd=tmp_path)
     r = _run("map", "--symbol", "amu/classify.py#classify_consumers", "--json", cwd=tmp_path)
     assert r.returncode == 0
     m = json.loads(r.stdout)

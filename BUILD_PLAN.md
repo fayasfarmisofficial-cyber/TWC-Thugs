@@ -411,3 +411,88 @@ shadow, verify --attempt-fallback with SCIP, docs --mode auto in CI, agent card 
 ## 8. Definition of "live" for the demo owner
 
 `amu map --file <f>` and `amu check --phase 1` run on the demo owner's machine from a clean clone using README instructions, with `entire amu map` also working. The Vercel URL opens `/card`, and pasting `amu map --json` output renders the agent card. Fallback: `docs/demo.cast` and `docs/screenshots/`.
+
+---
+
+# Phase 9 — Navigation, live graph rendering, and the gold identity
+
+Read `BUILD_PLAN.md` and `docs/ARCHITECTURE.md` before writing anything. This phase adds three things to the existing `amu` CLI: **workspace navigation**, **live graph rendering while work happens**, and a **gold visual identity**. It changes no honesty rule, no exit code, and no `--json` shape. Existing tests must stay green.
+
+## 9.1 — Workspace and repo navigation
+
+Right now `amu` only works on the current directory. Make it a workspace tool the way Claude Code is: you can add repos, switch between them, and every command runs against the active one.
+
+Add `amu/workspace.py` and a global `~/.amu/workspace.json`:
+
+```jsonc
+{ "active": "twc-thugs",
+  "repos": [ { "name":"twc-thugs", "path":"/Users/x/code/TWC-Thugs", "origin":"https://github.com/…",
+               "indexed_at":"…", "graph_hash":"…", "last_map":"amu/classify.py", "branch":"main" } ] }
+```
+
+Commands (all take `--json`):
+
+| Command | Behaviour |
+|---|---|
+| `amu repo add <path>` | Register a local repo. Verify it is a Git repo, run `entire graph index --repo <path>`, snapshot it, write `.amu/` inside it, make it active. Reject a path that is not a Git worktree with exit 2 and the reason. |
+| `amu repo add <owner/repo>` or a GitHub URL | `git clone` into `~/.amu/repos/<owner>__<repo>` (respect an existing clone: `git fetch && git status` instead of re-cloning), then the same index path as above. Use the user's existing git credentials; never prompt for or store a token. `--branch <b>`, `--depth 1` supported. |
+| `amu repo list` | Table: name · branch · files/symbols/relations · last indexed (relative) · active marker. |
+| `amu repo use <name>` | Switch active repo. Print the new banner header. |
+| `amu repo remove <name> [--delete-clone]` | Deregister; only delete files if the flag is passed and the repo lives under `~/.amu/repos`. |
+| `amu repo sync [--all]` | `git fetch` + re-index + re-snapshot; report what changed at entity level via `entire graph diff --base <old sha> --head HEAD`. |
+| `amu cd <name>` | Print the path only (so `cd "$(amu cd twc-thugs)"` works in a shell). Do not try to change the parent shell's directory. |
+
+Every existing command resolves its target as: `--repo` flag → repo containing `$PWD` → workspace active repo → error with the `amu repo add` hint.
+
+Also add in-repo navigation, all backed by `entire graph`, none of it re-implementing search:
+
+| Command | Backed by |
+|---|---|
+| `amu find "<plain sentence>"` | `entire graph search --profile full --format json`; render ranked hits with their `signals[]` (path / body / symbol-name / graph:callers) so the user sees *why* each ranked. `--open n2` prints the file:line. |
+| `amu open <path\|symbol>` | `entire graph def` + the surrounding declaration; then the one-line "next" (`amu map --symbol …`). |
+| `amu tree [path] [--depth N]` | Directory tree annotated per file with export count and feature label from `feature_map.json`. |
+| `amu neighbors <symbol> [--relation CALLS] [--direction in\|out]` | thin wrapper over `entire graph neighbors`. |
+| `amu where <symbol>` | def site + the file's feature + whether it is frozen in the current contract. |
+| `amu back` / `amu recent` | Navigation history stack in `.amu/nav.json` (last 20 targets), so `amu back` returns to the previous map. |
+
+In the interactive session, add slash commands `/repo`, `/use`, `/find`, `/open`, `/tree`, `/back`, and make bare text with a slash-free path or symbol resolve through `router.py` as an `explore` intent. Tab-completion for repo names, and for symbols from the snapshot, via `prompt_toolkit`.
+
+Rules: `amu` never invents a symbol — every name comes verbatim from `entire graph search` or `def`, and an unresolved one returns `not_found | ambiguous | multi_target`. Cloning is the only network operation; if `git clone` fails, print the exact command that failed and exit 3.
+
+## 9.2 — Live graph rendering while the work happens
+
+The graph should be visible during work, not only in a static `amu map` dump.
+
+1. **Live tree.** During the phase loop, `render.py` redraws the same PRD §9 tree in place (Rich `Live`, ~4 fps, `--no-live` to disable and `NO_COLOR`-safe) with a state column per node: `· planned  ▸ editing  ✓ green  ✗ red  ↯ drift`. State comes from `.amu/state.json` only — the renderer still computes nothing.
+2. **`amu watch`.** Watch the working tree (`watchfiles`); on each save, re-resolve the changed file against the active contract and update node states: file in this phase → `editing`; outside the contract → `↯ drift` warning line; an unknown node touched → `UNKNOWN_TOUCHED` warning. Debounce 300 ms. Never runs tests on its own — it renders, it does not verify.
+3. **`amu graph <symbol> [--depth 2] [--relation CALLS]`.** An ASCII relation graph rendered from `entire graph impact` / `neighbors`: the target in the centre column, callers above, callees below, type consumers and data flows in side sections, each edge labelled with its relation type and each node carrying its confidence glyph (`● sound · ◐ guessed · ○ unknown`). Deterministic layout — same input, same drawing. `--format dot` emits Graphviz and `--format mermaid` emits a Mermaid graph so it can go straight into a PR description.
+4. **Progress that names the relation.** While indexing or mapping, the spinner line reports the real work — `resolving callers of classify · 34 edges` — not a generic bar. Counts come from the graph, never estimated.
+5. **Web view (extends Phase 7).** `/graph` renders the same `amu graph --json` payload as an interactive node-link diagram (d3-force), nodes coloured by confidence, edges labelled by relation, click a node to see its reason and verify line. It reads a pasted or uploaded JSON file. No repo data is ever uploaded automatically.
+
+Everything here reads from the same JSON the terminal reads. If a rendering needs a fact the graph did not give, it shows `unknown` with a verify line — it does not infer.
+
+## 9.3 — Visual identity: gold
+
+Replace the current brand colours in `amu/brand.py`. Keep the `TWC THUGS` wordmark and the stderr-only rule; only the palette and layout change.
+
+```
+gold      #F5B32E   primary — wordmark, headers, active repo, selected row
+amber     #E08A1E   secondary — borders, rules, the prompt caret
+ember     #C2410C   accents on risk (will_break)
+sand      #FDF6E3   body text on dark
+ash       #8A8578   muted — via, paths, timestamps
+```
+
+- Wordmark in gold, subtitle in ash, a single amber rule under the header. Prompt: `twc-thugs ❯` with the caret in amber.
+- Confidence glyphs keep their own semantics and are **never** gold: sound green, guessed amber, unknown ash-hollow, risk ember. Colour stays redundant with the glyph so `NO_COLOR=1` still reads correctly — test it.
+- Panels use rounded borders in amber at 30% weight, generous padding, section labels in small-caps ash. No boxes inside boxes. One accent per screen region.
+- Degrade cleanly: truecolor → 256 → 16 → none. Under 100 columns drop `feature` and `via`, never the glyph or `verify`.
+- The Vercel pages and the agent card use the same five tokens as CSS variables; dark background `#161412`.
+
+Update `test_brand.py` to assert the palette constants, the `NO_COLOR` render, and that no ANSI escapes reach `--json`.
+
+## Done when
+
+`amu repo add <a GitHub URL>` clones, indexes, and becomes active; `amu find "…"` returns ranked hits with signals; `amu graph <symbol>` draws the relation graph and `--format mermaid` is valid Mermaid; `amu watch` updates node states live during an edit; the whole surface is gold and passes `NO_COLOR=1`; `pytest -q` and `ruff check .` are clean.
+
+Commit: `feat(p9): workspace + repo navigation, live graph rendering, gold identity`. Push. Then show me `amu repo list` and `amu graph classify --depth 2`.

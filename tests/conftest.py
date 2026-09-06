@@ -17,8 +17,10 @@ _EMPTY_BIN = TESTS_DIR / "_nobin"
 
 
 @pytest.fixture(autouse=True)
-def _hide_real_entire(monkeypatch):
+def _hide_real_entire(monkeypatch, tmp_path_factory):
     _EMPTY_BIN.mkdir(exist_ok=True)
+    # Isolate the workspace: never touch the developer's real ~/.amu from the suite.
+    monkeypatch.setenv("AMU_HOME", str(tmp_path_factory.mktemp("amu-home")))
     # Keep python + git reachable, drop package-manager bins where `entire` lives.
     keep = [p for p in os.environ.get("PATH", "").split(os.pathsep)
             if p and "homebrew" not in p and "/.local/share/entire" not in p]

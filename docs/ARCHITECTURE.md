@@ -18,3 +18,12 @@
 ## What stays invariant (tested)
 - unknown bucket never drops partial analysis; `check` degrades when `entire` is absent; cycles become warnings.
 - No output summarises with safe / clean / verified / OK.
+
+## Phase 9 additions (navigation, live rendering, gold)
+| Module | Role |
+|---|---|
+| `amu/workspace.py` | `~/.amu/workspace.json` (override `AMU_HOME`): add local/GitHub repos (clone into `~/.amu/repos/<owner>__<repo>`, reuse with fetch), use/remove/sync, `resolve()` = `--repo` → repo containing `$PWD` → active → error with the add hint. Cloning is the only network call. |
+| `amu/graphview.py` | `payload_from_impact()` → `{focus, nodes, edges, counts, status, candidates}`; `to_ascii / to_mermaid / to_dot`, deterministic (sorted), ids hashed for uniqueness. Ambiguous names list candidates with the exact `amu graph path#name` to run. |
+| `amu/watch.py` | pure `resolve_change(path, contract, map, phase)` → node states + warning lines; `run()` via watchfiles (300 ms debounce, stop_event) with stat-polling fallback. Never runs tests. |
+| `amu/render.py` | `LiveTree` (Rich Live, 4 fps, state column), `render_find`, `render_repo_table`, `render_dir_tree`; still computes nothing. |
+| `amu/brand.py` | gold palette tokens + Rich theme; confidence colours are semantic and never gold; `progress()` spinner names the relation and is silent off-TTY. |
