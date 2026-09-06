@@ -27,3 +27,12 @@
 | `amu/watch.py` | pure `resolve_change(path, contract, map, phase)` → node states + warning lines; `run()` via watchfiles (300 ms debounce, stop_event) with stat-polling fallback. Never runs tests. |
 | `amu/render.py` | `LiveTree` (Rich Live, 4 fps, state column), `render_find`, `render_repo_table`, `render_dir_tree`; still computes nothing. |
 | `amu/brand.py` | gold palette tokens + Rich theme; confidence colours are semantic and never gold; `progress()` spinner names the relation and is silent off-TTY. |
+
+## Phase 10 additions (bring your own model)
+| Module | Role |
+|---|---|
+| `amu/keys.py` | credential record `{provider, family, api_key, base_url, model, region, project_id, resource}` in `~/.amu/credentials.json` (0600). Order: `ANTHROPIC_API_KEY`/`OPENAI_BASE_URL` env → file → `ant auth login` profile. `masked()`/`source()` are the only things callers may print. |
+| `amu/harness/providers.py` | `make_client(cred)`: Anthropic family via the official SDK (`Anthropic`, `AnthropicBedrockMantle`, `AnthropicVertex`, `AnthropicFoundry`); OpenAI-compatible adapter (stdlib `urllib`) duck-typing `client.messages.create` with tool/message/stop-reason mapping. Anthropic-only params (`output_config.effort`, `cache_control`) are sent only to the Anthropic family. |
+| `amu/harness/model.py` | `available()`, `credential()`, `model_id()` (credential → config → `claude-opus-5`), `ask_json()` for the planner; manual mode on missing credential, auth error, refusal, or provider error. |
+| `amu/harness/chat.py` | `Assistant`: tool-using loop (streamed on Anthropic, single print elsewhere), first turn carries repo memory + map/contract context, system prompt cached. Tools are read-only wrappers over existing functions; role `assistant` in `roles.py` has no write tool. |
+| `amu/cli.py` | `amu key set|status|remove`, `amu ask`, REPL: change requests → deterministic router → map; other free text → `Assistant` when a credential exists, else the router verdict. |

@@ -28,7 +28,7 @@ outside the markers is byte-identical after a refresh (tested).
     amu plan --targets amu/classify.py#classify_consumers:signature --approve
     amu check --phase 1
     amu done
-Run tests: `pytest -q` (118 tests; the suite hides the real `entire` and replays fixtures via `tests/fake_entire.py`).
+Run tests: `pytest -q` (167 tests; the suite hides the real `entire`, isolates `~/.amu` via `AMU_HOME`, and replays fixtures via `tests/fake_entire.py`).
 
 ## Entire Checkpoints
 | Checkpoint | Commit | Checkpoint ID | Link | Proves |
@@ -70,6 +70,13 @@ Also: querying the cached committed tree (`--head`) took the per-symbol impact f
 Result: `ones` → 6 sound consumers across 4 files, 0 guessed, 0 unknown with the qualifier; `plan --approve` → proceed; `check --phase 1` → 0 blocking;
 editing a phase-3 file (`numpy/lib/_polynomial_impl.py`) → PHASE_DRIFT + delta brief, exit 1; `amu done` → 26 memory entries written to numpy's CLAUDE.md.
 
+## After the deadline: Phases 9–10 (same honesty rules, no `--json` shape changed)
+- **Workspace + navigation** (`amu/workspace.py`): `amu repo add <path|owner/repo|url> | list | use | remove | sync`, `amu cd`; `find` (ranked hits with `signals[]`), `open`, `tree`, `neighbors`, `where`, `back`/`recent`. Repo resolution: `--repo` → repo containing `$PWD` → active → exit 2 with the add hint.
+- **Live graph rendering**: `amu graph <path#sym>` ASCII / `--format json|dot|mermaid` (deterministic; an ambiguous name lists its candidates with the exact command instead of guessing), `amu watch` (node states `· ▸ ✓ ✗ ↯` from `.amu/state.json`, never runs tests), Rich `Live` tree in `check`, spinner that names the relation and count, `web/public/graph.html` d3-force viewer.
+- **Gold identity** (`amu/brand.py`): five tokens, confidence colours semantic and never gold, `NO_COLOR` reads identically, nothing branded reaches `--json`.
+- **Bring your own model** (`amu/keys.py`, `amu/harness/providers.py`, `amu/harness/chat.py`): `amu key set [--provider anthropic|bedrock|vertex|foundry|openai-compatible|ollama|lmstudio|openrouter]` (0600 file, env, or `ant auth login`; value never printed); `amu ask` and REPL free text run a tool-using loop over **read-only** graph tools (`graph_search`, `graph_def`, `amu_map`, `amu_graph`, `amu_where`, `amu_state`, `read_lines` labelled heuristic, `answer_unknown`). The assistant role has no write tool; it can widen a map or ask, never enlarge a contract or promote confidence. Default model `claude-opus-5`; OpenAI-compatible endpoints get the same loop through a `/v1/chat/completions` adapter.
+- **Numpy dogfood** (docs/TESTCASE-NUMPY.md): three real bugs found and fixed on numpy/numpy (null `entries`, silent 0 consumers on an ambiguous symbol, 323 parse failures as nodes); per-symbol impact 80 s → 1 s with `--head`.
+
 ## How amu builds on the Entire CLI (not beside it)
 `entire-amu` console script ⇒ `entire amu map …` dispatches through Entire's plugin mechanism (verified: `entire amu doctor`).
 Every graph fact is an `entire graph …` call routed through `amu/entire.py`; no parsing/indexing is re-implemented.
@@ -86,12 +93,14 @@ Every graph fact is an `entire graph …` call routed through `amu/entire.py`; n
 - test_roles — tool not granted raises; write guard; checker cannot downgrade a block; 3rd retry escalates
 - test_cli_smoke / test_brand — exit 3 + install hint without entire; key never printed; brand on stderr only, absent from --json
 - test_memory — markers idempotent; human text byte-identical; stale flips on hash change; caps + overflow; secret rejected
+- test_workspace / test_nav / test_graph / test_watch — repo add rejects non-git (exit 2), never deletes outside `~/.amu/repos`, resolution order; find/open/back/recent; Mermaid/dot shape + determinism + ambiguous focus; watch state transitions incl. a live watchfiles run
+- test_key / test_providers / test_chat — 0600 store, env-over-file, value never printed; provider validation, OpenAI mapping both ways, full loop through the adapter, provider errors reported not raised; scripted-client tool loop, ungranted tool → `is_error`, no write tool, path jail, secret rejection, refusal handling
 
 ## Databricks
 Not applicable.
 
 ## What's next
-Deploy web/ to Vercel + `/api/report` for `amu done --publish`, `verify --attempt-fallback` with SCIP, `docs --mode auto` in CI,
+Deploy web/ to Vercel + `/api/report` for `amu done --publish`, live-endpoint verification of `amu ask` (no credential on the build machine), `verify --attempt-fallback` with SCIP, `docs --mode auto` in CI,
 mapper ripple review, live checkpoint ids once the session hooks flush.
 
 (No secrets. Model key is read from ANTHROPIC_API_KEY at runtime; roles run in manual mode without it.)

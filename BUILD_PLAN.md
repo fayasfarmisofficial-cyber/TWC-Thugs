@@ -496,3 +496,13 @@ Update `test_brand.py` to assert the palette constants, the `NO_COLOR` render, a
 `amu repo add <a GitHub URL>` clones, indexes, and becomes active; `amu find "…"` returns ranked hits with signals; `amu graph <symbol>` draws the relation graph and `--format mermaid` is valid Mermaid; `amu watch` updates node states live during an edit; the whole surface is gold and passes `NO_COLOR=1`; `pytest -q` and `ruff check .` are clean.
 
 Commit: `feat(p9): workspace + repo navigation, live graph rendering, gold identity`. Push. Then show me `amu repo list` and `amu graph classify --depth 2`.
+
+
+---
+
+# Phase 10 — Bring your own model (executed 6 Sep 2026)
+
+`amu key set [--provider anthropic|bedrock|vertex|foundry|openai-compatible|ollama|lmstudio|openrouter] [--base-url] [--model] [--region] [--project] [--resource]`,
+`amu key status|remove`, `amu ask "<question>"`, and REPL free text → a tool-using assistant over read-only graph tools. See README ("Bring your own model")
+and docs/ARCHITECTURE.md (Phase 10). Rules kept: amu never writes source; the assistant cannot enlarge a contract or promote confidence; secrets are never printed;
+Anthropic-only request parameters are sent only to the Anthropic family.
