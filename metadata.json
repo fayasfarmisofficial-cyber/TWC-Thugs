@@ -1,0 +1,33 @@
+{
+  "cli_version": "0.10.5",
+  "checkpoint_id": "01M1V2DEJTNRZJPDWA2TPJF4EQ",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "README.md",
+    "amu/cli.py",
+    "amu/harness/chat.py",
+    "amu/harness/model.py",
+    "amu/harness/providers.py",
+    "amu/keys.py",
+    "tests/test_key.py",
+    "tests/test_providers.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 37,
+    "cache_creation_tokens": 13555,
+    "cache_read_tokens": 708484,
+    "output_tokens": 13208,
+    "api_call_count": 2
+  }
+}
