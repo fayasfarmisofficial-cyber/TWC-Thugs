@@ -1,91 +1,46 @@
-# BUILDATHON.md — Anti-Messup Agent (`amu`)
-### Bengaluru Tech Week Buildathon 2026 · Track 2: Graph Intelligence
+# Anti-Messup Agent (`amu`)
+> **A CLI safety harness for AI coding agents that wraps `entire-graph` to measure blast radius, enforce scope contracts, and generate topologically-safe refactoring sequences before the first keystroke.**
 
 ---
 
-## The Problem — Silent AI Agent Breakage
+## 1. Problem & Track 2 Fit
 
-Modern AI coding agents (Copilot, Cursor, Claude, etc.) edit code fast. Too fast.
+### The Problem — Silent AI Agent Breakage
 
-They routinely:
+AI coding agents (Copilot, Cursor, Claude, etc.) edit code at machine speed — without knowing who else depends on what they're touching. The result is **silent breakage**:
 
-- **Change a shared utility** without knowing 47 callers depend on it
-- **Delete a public symbol** that's dynamically dispatched from a plugin layer
-- **Mutate a frozen API** that a downstream team treats as a contract
+- A shared utility is renamed; 47 callers break at runtime
+- A frozen API signature is mutated; a downstream team's contract is violated
+- A public symbol is deleted; a plugin using dynamic dispatch explodes in production
 
-The result is **silent breakage** — tests pass locally, CI goes green on the happy path, and production blows up two deploys later. The agent had no idea because it never asked *"who else depends on this?"*
+Tests pass. CI is green. Production is on fire.
 
-`amu` (Anti-Messup Agent) is the answer: a CLI guardrail that forces any AI agent to **pause, measure blast radius, and generate a safe refactoring sequence** before touching a single line.
+**`amu` forces AI agents to pause, measure impact, and follow a safe edit sequence — before any code changes.**
 
----
+### Track 2 Fit — `entire-graph` at the Core
 
-## Track 2: How We Use `entire-graph`
+`amu` is built entirely on top of the `entire` graph engine, using three primitives:
 
-`amu` wraps the `entire` graph engine as a subprocess and exposes three purpose-built commands built on top of three `entire` primitives:
-
-### `entire graph impact` → `amu brief`
-
-```
-amu brief --symbol module.MyClass.method --depth 2 --json
-```
-
-Runs a full-profile, depth-2 graph traversal rooted at the target symbol.  
-The raw output is fed into our **3-bucket classifier** (see Curveball section).
-
-**Why `--profile full`**: partial profiles miss transitive consumers introduced through interface abstractions — exactly the class of bug that causes production incidents.
+| `entire` Command | `amu` Command | Purpose |
+|------------------|---------------|---------|
+| `entire graph impact` | `amu brief` | Blast-radius analysis rooted at target symbol |
+| `entire graph capabilities` | (feeds `amu brief`) | Declare what the engine *cannot* see — seeds the `unknown` bucket |
+| `entire graph diff` | `amu check` | Entity-level diff parsed for contract violations |
 
 ---
 
-### `entire graph capabilities` → unknown bucket seeding
+## 2. Noon Curveball Adaptation — Partial Analysis & Dynamic Dispatch
 
-```bash
-entire graph capabilities --json --repo .
-```
+The Track 2 Curveball constraint requires handling the reality that **static graph analysis is never complete**. Dynamic dispatch, reflection patterns, and out-of-coverage modules are invisible to any parser.
 
-Before classifying any caller, `amu` fetches the graph parser's declared capability envelope.  
-This tells us **what the engine itself admits it cannot see** — dynamic dispatch sites, reflection patterns, out-of-coverage modules.
+### Our Solution: The `unknown` Bucket
 
-These gaps are fed directly into the `unknown` bucket (see below) rather than being silently swallowed.
-
----
-
-### `entire graph diff` → `amu check`
-
-```bash
-amu check --base main --head HEAD \
-          --frozen "api.PublicFn" \
-          --scope  "api.PublicFn,api.NewFn" \
-          --removals "api.OldFn"
-```
-
-Parses entity-level diffs between two refs and enforces three contract rules:
-
-| Violation | Trigger | Exit |
-|-----------|---------|------|
-| `FROZEN_SIGNATURE` | Frozen symbol's signature mutated | `exit 1` |
-| `OUT_OF_SCOPE` | Changed symbol not in declared edit scope | `exit 1` |
-| `UNDECLARED_REMOVAL` | Public symbol deleted without plan entry | `exit 1` |
-
-This makes `amu check` **CI-embeddable**: wire it as a pre-merge gate and no AI-generated PR that violates scope or freezes can land without human review.
-
----
-
-## The Noon Curveball — Partial Analysis & Dynamic Dispatch
-
-The Track 2 Curveball constraint requires submissions to handle the reality that **graph analysis is never complete**:
-
-- Dynamic dispatch (`obj.method()` where `obj` type is unknown at parse time)
-- Reflection-based call patterns
-- Out-of-coverage modules (vendored code, native extensions, external repos)
-
-### Our Approach: The `unknown` Bucket
-
-Every `amu brief` call produces **three explicit buckets** — not two:
+Every `amu brief` response produces **three explicit buckets** — never two:
 
 ```json
 {
-  "will_break":  [...],   // Statically resolved direct callers (hop 1)
-  "might_break": [...],   // Statically resolved transitive callers (hop 2)
+  "will_break":  [ ... ],
+  "might_break": [ ... ],
   "unknown": {
     "unresolved_callsites":   3,
     "dynamic_dispatch_sites": 0,
@@ -97,94 +52,186 @@ Every `amu brief` call produces **three explicit buckets** — not two:
 }
 ```
 
-**Key design decisions:**
+### Design Decisions
 
-1. **Never discard partial evidence** — `unresolved_callsites` is always counted, never silently zeroed.
-2. **Inherit engine limits** — `capabilities()` seeds `out_of_coverage` directly from what `entire` tells us it cannot parse. We don't guess.
-3. **Stable schema invariant** — the `unknown` bucket has the same four keys regardless of input. Downstream agents can always read `unknown.unresolved_callsites > 0` as *"human review required"*.
-4. **Safe fallback** — if `entire` is not installed (CI bootstrap, offline dev), `capabilities()` returns a conservative default that lists `dynamic_dispatch` and `reflection` as unresolved patterns. No crash, no silent pass.
+| Decision | Rationale |
+|----------|-----------|
+| **Never discard partial evidence** | `unresolved_callsites` is always counted — never silently zeroed |
+| **Inherit engine limits** | `capabilities()` seeds `out_of_coverage` directly from what `entire` reports it cannot parse |
+| **Stable schema invariant** | `unknown` always has the same 4 keys regardless of input — agents can reliably read `unknown.unresolved_callsites > 0` as *"human review required"* |
+| **Safe CLI fallback** | If `entire` is absent (CI bootstrap, offline), `capabilities()` returns a conservative default listing `dynamic_dispatch` and `reflection` as unresolved — no crash, no silent pass |
+| **Graceful cycle recovery** | `graphlib.CycleError` in plan generation is caught and surfaced as a warning; the agent gets an approximate order and an explicit flag to review manually |
 
-This means an AI agent consuming `amu brief --json` can implement a simple policy:
+### Curveball Compliance Contract (for AI Agents)
 
 ```python
+brief = amu_brief("module.MyFn", json=True)
+
 if brief["buckets"]["unknown"]["unresolved_callsites"] > 0:
     escalate_to_human_review()
+elif brief["buckets"]["will_break"]:
+    run_plan_and_migrate()
+else:
+    proceed_with_edit()
 ```
 
 ---
 
-## Architecture
+## 3. Architecture Overview
 
 ```
 amu/
-├── graph.py      # Subprocess wrappers: entire graph impact / diff / capabilities
-│                 #   └── graceful fallback when CLI absent
+├── graph.py      # Subprocess wrappers → entire graph impact / diff / capabilities
+│                 #   └── FileNotFoundError + OSError caught; graceful str/dict fallback
 ├── classify.py   # 3-bucket classifier
-│                 #   └── dynamic/unresolved lines → unknown, never dropped
+│                 #   └── dynamic/unresolved lines → unknown, never dropped or misclassified
 ├── plan.py       # graphlib.TopologicalSorter → 4-phase refactoring sequence
 │                 #   └── CycleError caught, surfaced as warning, not crash
-├── contract.py   # Entity diff parser + FROZEN / OUT_OF_SCOPE / UNDECLARED checks
-│                 #   └── allow_cli_unavailable=True for safe CI degradation
-└── cli.py        # Typer entrypoint (brief / plan / check)
+├── contract.py   # Entity diff parser + violation checker
+│                 #   └── FROZEN_SIGNATURE / OUT_OF_SCOPE / UNDECLARED_REMOVAL
+└── cli.py        # Typer entrypoint — three commands
 
 tests/
-├── test_classify.py   # Unknown bucket, fallback, classification accuracy (15 tests)
-├── test_plan.py       # Phase assignment, cycle recovery, serialisation (21 tests)
-├── test_contract.py   # All 3 violation kinds, severity, fallback (15 tests)
+├── test_classify.py   # Unknown bucket, fallback, classification accuracy  (15 tests)
+├── test_plan.py       # Phase assignment, cycle recovery, serialisation     (21 tests)
+├── test_contract.py   # Violation detection + CLI-unavailable fallback      (15 tests)
 └── test_amu.py        # Integration: unknown routing + graph fallback safety (21 tests)
+                                                              Total: 72 tests ✅
 ```
 
-**Total: 72 tests, 0 failures.**
+### `amu brief` — Blast Radius Analysis
 
----
+Wraps `entire graph impact --profile full` and classifies every consumer into one of three buckets. Dynamic dispatch / unresolved references are **explicitly** routed to `unknown`, never silently dropped.
 
-## The 4-Phase Refactoring Plan
+```
+[WILL BREAK]         2 item(s)   ← direct callers, hop 1, statically resolved
+[MIGHT BREAK]        5 item(s)   ← transitive callers, hop 2, statically resolved
+[UNKNOWN / PARTIAL]  3 unresolved callsites, out_of_coverage: [legacy_module]
+```
 
-`amu plan` uses Python's stdlib `graphlib.TopologicalSorter` to sequence edits safely:
+### `amu plan` — Topological 4-Phase Refactoring Sequence
+
+Uses Python stdlib `graphlib.TopologicalSorter` on the reverse-dependency graph to produce a safe edit order:
 
 | Phase | Who | Rule |
 |-------|-----|------|
-| **1 · Additive** | `new:*`-prefixed symbols | Introduce new API without removing old — zero breakage |
-| **2 · Migration** | Direct callers (hop 1) | Update call sites before signature is removed |
+| **1 · Additive** | `new:*`-prefixed symbols | Introduce new API — zero breakage |
+| **2 · Migration** | Direct callers (hop 1) | Update call sites before old signature is removed |
 | **3 · Interior** | Transitive callers (hop 2+) | Safe to update once direct callers are migrated |
 | **4 · Removal** | Target symbol | Delete old symbol only after all consumers are migrated |
 
-If a cyclic dependency is detected, the cycle is **surfaced as an explicit warning** and the plan degrades gracefully to insertion order — the agent is told to resolve manually rather than receiving a silent wrong answer.
+### `amu check` — Contract Guardrail (CI Gate)
+
+Parses `entire graph diff` output and blocks on any of three violation classes:
+
+| Violation | Trigger | Exit |
+|-----------|---------|------|
+| `FROZEN_SIGNATURE` | Frozen symbol's signature mutated | `exit 1` |
+| `OUT_OF_SCOPE` | Changed symbol not in declared edit scope | `exit 1` |
+| `UNDECLARED_REMOVAL` | Public symbol deleted without plan entry | `exit 1` |
+
+Wire as a pre-merge CI gate — no AI-generated PR that breaks contracts can land without human review.
 
 ---
 
-## Quickstart
+## 4. Setup & Usage
+
+### Installation
 
 ```bash
-# Install
-pip install -e ".[dev]"
+# Clone the repo
+git clone https://github.com/fayasfarmisofficial-cyber/TWC-Thugs.git
+cd TWC-Thugs
 
-# Pre-edit: measure blast radius
+# Install with dev dependencies
+pip install -e ".[dev]"
+```
+
+### `amu brief` — Pre-edit impact analysis
+
+```bash
+# Human-readable output
 amu brief --symbol mypackage.api.create_user --depth 2
 
-# Generate safe edit sequence
+# JSON for agent consumption
+amu brief --symbol mypackage.api.create_user --depth 2 --json
+```
+
+### `amu plan` — Generate safe refactoring sequence
+
+```bash
+# Pretty-print the 4-phase plan
+amu plan --symbol mypackage.api.create_user
+
+# JSON output (pipe into your agent)
 amu plan --symbol mypackage.api.create_user --json
+```
 
-# Post-edit: enforce contract (add to CI)
-amu check --base main --head HEAD \
-          --frozen "mypackage.api.create_user" \
-          --scope  "mypackage.api.create_user,mypackage.api.create_user_v2"
+### `amu check` — Run contract guardrail
 
-# Run tests
-pytest tests/ -v
+```bash
+# Basic check (between main and HEAD)
+amu check --base main --head HEAD
+
+# With frozen symbols, declared scope, and planned removals
+amu check \
+  --base main \
+  --head HEAD \
+  --frozen  "mypackage.api.create_user" \
+  --scope   "mypackage.api.create_user,mypackage.api.create_user_v2" \
+  --removals "mypackage.api.legacy_create"
+
+# Strict mode: treat missing entire CLI as a hard failure (for enforced CI)
+amu check --base main --head HEAD --strict
+```
+
+### Run the Test Suite
+
+```bash
+# All 72 tests
+pytest
+
+# Verbose with coverage
+pytest tests/ -v --tb=short
+```
+
+Expected output:
+```
+72 passed in 0.09s
 ```
 
 ---
 
-## Why This Wins Track 2
+## 5. Entire Checkpoints
 
-| Criterion | What we deliver |
-|-----------|----------------|
-| `entire-graph` integration | `impact`, `capabilities`, `diff` — all three primitives used |
-| Curveball compliance | `unknown` bucket with stable schema; never silent-drops partial evidence |
-| Graph intelligence | Topological 4-phase plan from reverse-dep edges |
-| Production-safe | Graceful fallback on CLI absence; cycle recovery; non-zero exit on violations |
-| Test coverage | 72 passing tests across all modules |
-| CI-embeddable | `amu check` exits 1 on violations — drop into any pipeline |
+> Fill in your checkpoint IDs after running `entire enable -y && entire status`
 
-> `amu` doesn't just analyze blast radius. It **prevents the messup before the first keystroke.**
+| # | Checkpoint Description | Entire ID / Link |
+|---|----------------------|-----------------|
+| 1 | Initial skeleton — `graph.py`, `classify.py`, `cli.py` | `<!-- PASTE ID HERE -->` |
+| 2 | `plan.py` — topological 4-phase refactoring plan | `<!-- PASTE ID HERE -->` |
+| 3 | `contract.py` — FROZEN / OUT_OF_SCOPE / UNDECLARED_REMOVAL checks | `<!-- PASTE ID HERE -->` |
+| 4 | Final post-curveball — `test_amu.py` + hardened graph fallback | `<!-- PASTE ID HERE -->` |
+
+To generate your checkpoint after each phase:
+
+```bash
+entire enable -y
+entire status
+# Copy the ID from the output and paste it into the table above
+```
+
+---
+
+## 6. Why `amu` Wins Track 2
+
+| Judging Criterion | What `amu` Delivers |
+|-------------------|-------------------|
+| `entire-graph` depth | All 3 primitives used: `impact`, `capabilities`, `diff` |
+| Curveball compliance | `unknown` bucket with stable 4-key schema; dynamic dispatch never silently dropped |
+| Graph intelligence | `graphlib.TopologicalSorter` 4-phase plan from reverse-dep edges |
+| Production safety | `exit 1` on violations; graceful CLI fallback; cycle recovery with explicit warnings |
+| Test coverage | **72 passing tests** across all 4 modules |
+| CI-embeddable | `amu check` is a drop-in pre-merge gate |
+
+> **`amu` doesn't just analyze blast radius. It prevents the messup before the first keystroke.**
