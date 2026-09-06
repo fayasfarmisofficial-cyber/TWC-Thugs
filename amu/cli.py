@@ -884,6 +884,78 @@ def skills_add(name: str, text: str = typer.Option("", "--text"), repo: str = RE
     typer.echo(f"wrote {d / 'SKILL.md'}")
 
 
+
+# ---------------------------------------------------------------------------
+# model status + guided key setup (REPL)
+# ---------------------------------------------------------------------------
+
+_PROVIDER_MENU = [
+    ("anthropic", "Anthropic API key (claude-opus-5)", ["key"]),
+    ("ollama", "Ollama, local, no key", ["model"]),
+    ("lmstudio", "LM Studio, local, no key", ["model"]),
+    ("openrouter", "OpenRouter (key + model, e.g. anthropic/claude-opus-5)", ["key", "model"]),
+    ("openai-compatible", "Any OpenAI-compatible endpoint (base URL + model, key optional)", ["base_url", "model", "key?"]),
+    ("bedrock", "Amazon Bedrock (AWS credentials from your environment)", ["region"]),
+    ("vertex", "Google Vertex AI (gcloud ADC)", ["project", "region"]),
+    ("foundry", "Microsoft Foundry (resource + key)", ["resource", "key"]),
+]
+
+
+def model_status_line() -> str:
+    """One line for the banner: ● on with provider/model, or ○ off with the two-step guide."""
+    if keys.available():
+        c = keys.credential()
+        return f"[conf.sound]● model on[/] · {c.get('provider')} · {c.get('model')} · via {c['source']}"
+    return "[conf.unknown]○ model off[/] · no API key added · type [brand]/key add[/] (2 steps) or run [brand]amu key set[/] — the graph commands work without it"
+
+
+def guided_key_setup() -> bool:
+    """Interactive, provider-aware. Returns True when a credential was stored."""
+    c = brand.err_console()
+    c.print("[brand]add a model[/] [brand.muted]— pick a provider; keys are stored in ~/.amu/credentials.json (0600) and never printed[/]")
+    for i, (name, desc, _) in enumerate(_PROVIDER_MENU, 1):
+        c.print(f"  [brand.muted]{i}[/]  {name:<18} [brand.body]{desc}[/]")
+    try:
+        choice = typer.prompt("provider (number or name)", default="1").strip().lower()
+    except (EOFError, KeyboardInterrupt):
+        return False
+    name = choice
+    if choice.isdigit() and 1 <= int(choice) <= len(_PROVIDER_MENU):
+        name = _PROVIDER_MENU[int(choice) - 1][0]
+    entry = next((e for e in _PROVIDER_MENU if e[0] == name), None)
+    if not entry:
+        c.print(f"[risk]unknown provider {choice}[/] — choose 1-{len(_PROVIDER_MENU)}")
+        return False
+    fields: dict = {}
+    try:
+        for f in entry[2]:
+            if f == "key":
+                fields["api_key"] = typer.prompt(f"{name} API key", hide_input=True)
+            elif f == "key?":
+                v = typer.prompt("API key (blank if none)", default="", hide_input=True, show_default=False)
+                fields["api_key"] = v or None
+            elif f == "model":
+                default = keys.PROVIDERS[name][1] or ""
+                fields["model"] = typer.prompt("model", default=default) if default else typer.prompt("model")
+            elif f == "base_url":
+                fields["base_url"] = typer.prompt("base URL (…/v1)")
+            elif f == "region":
+                fields["region"] = typer.prompt("region")
+            elif f == "project":
+                fields["project_id"] = typer.prompt("GCP project id")
+            elif f == "resource":
+                fields["resource"] = typer.prompt("Foundry resource")
+    except (EOFError, KeyboardInterrupt):
+        c.print("[brand.muted]cancelled — nothing stored[/]")
+        return False
+    try:
+        path = keys.set_credential(name, **fields)
+    except ValueError as exc:
+        c.print(f"[risk]{exc}[/]")
+        return False
+    c.print(f"[conf.sound]● model on[/] · stored {path} (0600) · {keys.masked()}")
+    return True
+
 def _completer(repo: str):
     try:
         from prompt_toolkit.completion import WordCompleter
@@ -921,8 +993,22 @@ def _repl(repo: str | None = None):
     brand.banner(__version__, state.repo_name(repo), f"{'enabled' if entire.available() else 'missing'} · graph {entire.graph_version()}")
     from amu.harness.chat import Assistant
     assistant = Assistant(repo) if keys.available() else None
-    brand.err_console().print(f"[brand.muted]model {'ready · ' + assistant.model if assistant else 'manual mode — amu key set to make the session interactive'}[/]")
+    brand.err_console().print(model_status_line())
     lookup = _lookup_factory(repo)
+
+    def _key_cmd(arg: str):
+        nonlocal assistant
+        if arg in ("add", "set", "on"):
+            if guided_key_setup():
+                assistant = Assistant(repo)
+        elif arg in ("remove", "off"):
+            keys.remove_key()
+            assistant = None
+            brand.err_console().print(model_status_line())
+        else:
+            brand.err_console().print(model_status_line())
+            if not keys.available():
+                brand.err_console().print("[brand.muted]  /key add  → guided setup (provider, key or model)   ·   /key remove  → forget the stored key[/]")
     while True:
         try:
             line = _read_line(repo)
@@ -952,8 +1038,8 @@ def _repl(repo: str | None = None):
                     "back": lambda: back(repo=repo, json_output=False),
                     "graph": lambda: graph(arg, depth=2, relation=None, fmt="text", repo=repo, json_output=False),
                     "ask": lambda: (typer.echo(assistant.ask(arg)) if not assistant or not arg else (assistant.ask(arg), typer.echo(""))),
-                    "key": lambda: key_status(json_output=False),
-                    "help": lambda: typer.echo("/map <file> /plan /approve /check N /done /docs /verify nX /why nX /feature X /skills /repo /use <name> /find <words> /open <sym> /tree [path] /graph <sym> /back /ask <question> /key — or just talk: a change request maps it, anything else goes to the model")}
+                    "key": lambda: _key_cmd(arg),
+                    "help": lambda: typer.echo("/map <file> /plan /approve /check N /done /docs /verify nX /why nX /feature X /skills /repo /use <name> /find <words> /open <sym> /tree [path] /graph <sym> /back /ask <question> /key [add|remove] — or just talk: a change request maps it, anything else goes to the model")}
             try:
                 cmds.get(r["intent"], cmds["help"])()
                 if r["intent"] == "use" and workspace.get(arg):
@@ -980,7 +1066,8 @@ def _repl(repo: str | None = None):
             assistant.ask(line + hint)
             typer.echo("")
         else:
-            typer.echo(f"router: {r['status']} — name the symbol exactly as `entire graph search` reports it" + (f" (ambiguous: {r.get('ambiguous')})" if r.get("ambiguous") else "") + " · `amu key set` enables free-text questions")
+            typer.echo(f"router: {r['status']} — name the symbol exactly as `entire graph search` reports it" + (f" (ambiguous: {r.get('ambiguous')})" if r.get("ambiguous") else ""))
+            brand.err_console().print("[conf.unknown]○ model off[/] — free-text questions need a model: type [brand]/key add[/] to connect one (Anthropic, Ollama, OpenRouter, …); slash commands and change requests work without it")
 
 
 if __name__ == "__main__":
