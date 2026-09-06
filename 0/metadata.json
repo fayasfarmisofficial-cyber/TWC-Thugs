@@ -1,0 +1,86 @@
+{
+  "cli_version": "0.10.5",
+  "checkpoint_id": "01M1V03TV4CRP5HMMVA1PWAABT",
+  "session_id": "d4f30598-d0b0-414e-bf84-640706b1a302",
+  "strategy": "manual-commit",
+  "created_at": "2026-09-06T09:17:14.588367Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "docs/TESTCASE-NUMPY.md"
+  ],
+  "agent": "Claude Code",
+  "model": "claude-fable-5-1",
+  "turn_id": "080136ea0882",
+  "checkpoint_transcript_start": 432,
+  "transcript_lines_at_start": 432,
+  "compact_transcript_start": 74,
+  "token_usage": {
+    "input_tokens": 4,
+    "cache_creation_tokens": 942,
+    "cache_read_tokens": 208699,
+    "output_tokens": 3839,
+    "api_call_count": 1
+  },
+  "skill_events_version": 1,
+  "skill_events": [
+    {
+      "id": "claude-skill-toolu_017fmrjJuqY8stwYZ4xm7yLh",
+      "event_type": "tool_invocation",
+      "skill": {
+        "name": "run"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "skill_tool_use",
+        "confidence": "explicit"
+      },
+      "turn_id": "65ed61542efb",
+      "transcript_anchor": {
+        "unit": "line",
+        "start": 298,
+        "end": 299,
+        "entry_ids": [
+          "084db040-aac3-4dcc-bb13-3713618decf6"
+        ],
+        "tool_use_id": "toolu_017fmrjJuqY8stwYZ4xm7yLh"
+      },
+      "native": {
+        "tool_name": "Skill",
+        "tool_use_id": "toolu_017fmrjJuqY8stwYZ4xm7yLh"
+      },
+      "collapse": {
+        "target": "tool_pair",
+        "label": "Skill: run",
+        "default_collapsed": true
+      }
+    }
+  ],
+  "session_metrics": {
+    "turn_count": 3
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-09-06T09:17:14.511233Z",
+    "agent_lines": 96,
+    "agent_removed": 0,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 96,
+    "total_lines_changed": 96,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 3,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".amu/skills/build/SKILL.md": 3
+      }
+    }
+  ]
+}
