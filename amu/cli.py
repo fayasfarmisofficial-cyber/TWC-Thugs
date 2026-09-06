@@ -128,12 +128,13 @@ def doctor(repo: str = REPO_OPT, json_output: bool = JSON_OPT):
     brand.header("doctor", state.repo_name(repo), json_output)
     ok = entire.available() and entire.graph_available()
     d = {"entire": entire.version(), "graph": entire.graph_version(), "doctor": entire.doctor() if ok else {"error": "entire missing"},
-         "anthropic_key_present": keys.available(), "anthropic_key_source": keys.source(), "model": state.config(repo).get("model", "claude-opus-5"),
+         "anthropic_key_present": keys.available(), "anthropic_key_source": keys.source(), "provider": keys.credential().get("provider"),
+         "model": keys.credential().get("model") or state.config(repo).get("model", "claude-opus-5"),
          "unparsed": state.config(repo).get("unparsed", []),
          "install": None if ok else entire.INSTALL_HINT}
     _out(d, json_output)
     if not json_output:
-        typer.echo(f"entire {d['entire']} · graph {d['graph']} · model {d['model']} · credential {d['anthropic_key_source'] if d['anthropic_key_present'] else 'absent (manual mode) → amu key set'} · unparsed {len(d['unparsed'])}")
+        typer.echo(f"entire {d['entire']} · graph {d['graph']} · model {d['model']} · credential {(d['provider'] + ' via ' + d['anthropic_key_source']) if d['anthropic_key_present'] else 'absent (manual mode) → amu key set'} · unparsed {len(d['unparsed'])}")
         if not ok:
             typer.echo(f"install: {entire.INSTALL_HINT}")
     if not ok:
@@ -748,13 +749,17 @@ def watch_cmd(phase: int = typer.Option(None, "--phase"), no_live: bool = typer.
 # ---------------------------------------------------------------------------
 
 @key_app.command("set")
-def key_set(value: str = typer.Option(None, "--value", help="pass the key non-interactively (prefer the hidden prompt or ANTHROPIC_API_KEY)"),
+def key_set(value: str = typer.Option(None, "--value", help="API key (prefer the hidden prompt or an env var)"),
+            provider: str = typer.Option("anthropic", "--provider", help="anthropic|bedrock|vertex|foundry|openai-compatible|ollama|lmstudio|openrouter"),
+            base_url: str = typer.Option(None, "--base-url"), model: str = typer.Option(None, "--model"),
+            region: str = typer.Option(None, "--region"), project: str = typer.Option(None, "--project"), resource: str = typer.Option(None, "--resource"),
             json_output: bool = JSON_OPT):
-    """Store the Anthropic API key in ~/.amu/credentials.json (mode 0600)."""
-    brand.header("key set", "~/.amu", json_output)
-    v = value or typer.prompt("Anthropic API key", hide_input=True)
+    """Bring your own provider. Stores ~/.amu/credentials.json (mode 0600); the key is never printed."""
+    brand.header("key set", provider, json_output)
+    needs_key = keys.PROVIDERS.get(provider, (None, None, None, True))[3]
+    v = value if value is not None else (typer.prompt(f"{provider} API key", hide_input=True) if needs_key or provider in ("openai-compatible",) else None)
     try:
-        path = keys.set_key(v)
+        path = keys.set_credential(provider, api_key=v, base_url=base_url, model=model, region=region, project_id=project, resource=resource)
     except ValueError as exc:
         typer.echo(str(exc), err=True)
         raise typer.Exit(code=2)
@@ -766,10 +771,12 @@ def key_set(value: str = typer.Option(None, "--value", help="pass the key non-in
 
 @key_app.command("status")
 def key_status(json_output: bool = JSON_OPT):
-    out = {"source": keys.source(), "masked": keys.masked() if keys.available() else None, "model": state.config(".").get("model", "claude-opus-5")}
+    c = keys.credential()
+    out = {"source": c["source"], "provider": c.get("provider"), "model": c.get("model"), "base_url": c.get("base_url"), "masked": keys.masked() if keys.available() else None,
+           "providers": list(keys.PROVIDERS)}
     _out(out, json_output)
     if not json_output:
-        typer.echo(f"credential {out['source']}" + (f" · {out['masked']}" if out['masked'] else " · run `amu key set` or export ANTHROPIC_API_KEY") + f" · model {out['model']}")
+        typer.echo(f"credential {out['source']}" + (f" · {out['masked']}" if out["masked"] else " · run `amu key set [--provider …]`; providers: " + ", ".join(keys.PROVIDERS)))
 
 
 @key_app.command("remove")

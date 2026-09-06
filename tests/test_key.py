@@ -16,7 +16,7 @@ def test_set_stores_0600_and_never_prints_value(tmp_path):
     r = _amu(["key", "set", "--value", "sk-ant-api03-testvalue-abcdef123456"])
     assert r.returncode == 0 and "sk-ant-api03-testvalue-abcdef123456" not in r.stdout + r.stderr and "…3456" in r.stdout
     p = keys._path()
-    assert oct(p.stat().st_mode & 0o777) == "0o600" and json.loads(p.read_text())["anthropic_api_key"].endswith("3456")
+    assert oct(p.stat().st_mode & 0o777) == "0o600" and json.loads(p.read_text())["api_key"].endswith("3456") and json.loads(p.read_text())["provider"] == "anthropic"
     assert keys.source() == "file"
 
 
@@ -35,7 +35,7 @@ def test_rejects_non_key():
 def test_status_and_remove():
     keys.set_key("sk-ant-api03-file-value-000000000000")
     s = json.loads(_amu(["key", "status", "--json"]).stdout)
-    assert s["source"] == "file" and s["masked"].startswith("sk-ant-…") and "file-value" not in json.dumps(s)
+    assert s["source"] == "file" and s["provider"] == "anthropic" and "…0000" in s["masked"] and "file-value" not in json.dumps(s)
     assert keys.remove_key() is True and keys.source() == "absent" and keys.remove_key() is False
 
 

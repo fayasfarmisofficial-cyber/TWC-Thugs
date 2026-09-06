@@ -1,11 +1,13 @@
-"""Anthropic client wrapper. Credential order: ANTHROPIC_API_KEY → ~/.amu/credentials.json → `ant auth login` profile.
-No credential ⇒ `manual` mode: the caller prints the brief and waits for a human. The key value is never printed."""
+"""Model access for the harness. Bring your own provider: `amu key set --provider …`.
+Credential order: ANTHROPIC_API_KEY / OPENAI_BASE_URL env → ~/.amu/credentials.json → `ant auth login` profile.
+No credential ⇒ `manual` mode. Secrets are never printed."""
 
 from __future__ import annotations
 
 import json
 
 from amu import keys, state
+from amu.harness import providers
 
 DEFAULT_MODEL = "claude-opus-5"
 
@@ -14,14 +16,22 @@ def available() -> bool:
     return keys.available()
 
 
+def credential() -> dict:
+    return keys.credential()
+
+
 def model_id(repo: str = ".") -> str:
-    return state.config(repo).get("model") or DEFAULT_MODEL
+    c = credential()
+    return c.get("model") or state.config(repo).get("model") or DEFAULT_MODEL
 
 
 def client():
-    import anthropic  # noqa: WPS433
-    k = keys.resolve()
-    return anthropic.Anthropic(api_key=k) if k else anthropic.Anthropic()
+    return providers.make_client(credential())
+
+
+def request_kwargs(cred: dict, effort: str = "medium") -> dict:
+    """Anthropic-only parameters are dropped for other families (an OpenAI-compatible endpoint would reject them)."""
+    return {"output_config": {"effort": effort}} if providers.supports_anthropic_params(cred) else {}
 
 
 def _manual(next_: str) -> dict:
@@ -32,6 +42,7 @@ def ask_json(system: str, user: str, model: str | None = None) -> dict:
     """One JSON object out; retries once on non-JSON. Never raises on a missing credential."""
     if not available():
         return _manual("run `amu key set` or export ANTHROPIC_API_KEY, or answer by hand")
+    cred = credential()
     try:
         c = client()
     except ImportError:
@@ -39,11 +50,11 @@ def ask_json(system: str, user: str, model: str | None = None) -> dict:
     import anthropic
     for _ in range(2):
         try:
-            msg = c.messages.create(model=model or DEFAULT_MODEL, max_tokens=4000, system=system,
-                                    output_config={"effort": "medium"}, messages=[{"role": "user", "content": user}])
+            msg = c.messages.create(model=model or model_id(), max_tokens=4000, system=system, messages=[{"role": "user", "content": user}],
+                                    **request_kwargs(cred))
         except anthropic.AuthenticationError:
             return _manual("credential rejected: run `amu key set` again")
-        except (anthropic.APIStatusError, anthropic.APIConnectionError) as exc:
+        except (anthropic.APIStatusError, anthropic.APIConnectionError, providers.ProviderError) as exc:
             return _manual(f"model call failed ({type(exc).__name__}); answer by hand")
         if msg.stop_reason == "refusal":
             return _manual("model declined this request; answer by hand")

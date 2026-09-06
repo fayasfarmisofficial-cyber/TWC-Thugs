@@ -13,6 +13,7 @@ from typing import Callable
 from amu import entire, graphview, state
 from amu.classify import build_map
 from amu.harness import model as modelmod
+from amu.harness import providers
 from amu.harness.prompts import CLOSING, PREAMBLE
 from amu.harness.roles import ToolNotGranted, make_role
 
@@ -49,6 +50,7 @@ class Assistant:
         self.out = out or (lambda t: print(t, end="", flush=True))
         self.stream = stream
         self.role = make_role("assistant")
+        self.cred = modelmod.credential()
         self.model = modelmod.model_id(repo)
         self.effort = state.config(repo).get("effort", "medium")
         self.messages: list[dict] = []
@@ -119,9 +121,12 @@ class Assistant:
 
     def _call(self, client, tools):
         kwargs = dict(model=self.model, max_tokens=16000, system=[{"type": "text", "text": ASSISTANT_SYSTEM, "cache_control": {"type": "ephemeral"}}],
-                      tools=tools, messages=self.messages, output_config={"effort": self.effort})
-        if not self.stream:
-            return client.messages.create(**kwargs)
+                      tools=tools, messages=self.messages, **modelmod.request_kwargs(self.cred, self.effort))
+        if not self.stream or not hasattr(client.messages, "stream"):
+            msg = client.messages.create(**kwargs)
+            if self.stream:  # non-streaming provider: print the text once
+                self.out("".join(getattr(b, "text", "") for b in msg.content if b.type == "text"))
+            return msg
         with client.messages.stream(**kwargs) as s:
             for ev in s:
                 if ev.type == "content_block_delta" and getattr(ev.delta, "type", "") == "text_delta":
@@ -130,7 +135,7 @@ class Assistant:
 
     def ask(self, text: str, max_turns: int = 8) -> str:
         if not modelmod.available():
-            return "manual mode: no credential — run `amu key set` (or export ANTHROPIC_API_KEY) to make the session interactive"
+            return "manual mode: no credential — run `amu key set [--provider …]` (or export ANTHROPIC_API_KEY / OPENAI_BASE_URL) to make the session interactive"
         client = self._client or modelmod.client()
         if not self.messages:
             text = f"<context>{self._context()}</context>\n\n{text}"
@@ -143,8 +148,8 @@ class Assistant:
                 msg = self._call(client, tools)
             except anthropic.AuthenticationError:
                 return "credential rejected — run `amu key set` again"
-            except (anthropic.APIStatusError, anthropic.APIConnectionError) as exc:
-                return f"model call failed: {type(exc).__name__}"
+            except (anthropic.APIStatusError, anthropic.APIConnectionError, providers.ProviderError) as exc:
+                return f"model call failed: {type(exc).__name__}: {str(exc)[:200]}"
             self.messages.append({"role": "assistant", "content": msg.content})
             text_out = "".join(b.text for b in msg.content if b.type == "text")
             final = text_out or final

@@ -21,6 +21,16 @@ Interactive: `amu` (no args) opens the TWC Thugs REPL (gold identity, tab-comple
 
 Web (Vercel, static): `web/public` — `/` install page, `/card` agent-card viewer for `amu map --json`, `/graph` d3-force viewer for `amu graph --format json`. Same five gold tokens as the terminal. Import the repo with root dir `web/`.
 
+Bring your own model:
+```bash
+amu key set                                              # Anthropic key, hidden prompt (or export ANTHROPIC_API_KEY)
+amu key set --provider ollama --model qwen2.5-coder      # local, no key
+amu key set --provider openrouter --model anthropic/claude-opus-5   # prompts for the key
+amu key set --provider bedrock --region us-east-1        # AWS credentials from the environment
+amu key set --provider vertex --project my-gcp --region global
+OPENAI_BASE_URL=http://localhost:8000/v1 AMU_MODEL=my-model amu ask "…"   # env override, no file
+```
+
 MCP (Claude Code / Cursor) — `.mcp.json`:
 ```json
 {"mcpServers": {"amu": {"command": "python", "args": ["-m", "amu.mcp_server"]}}}
@@ -41,7 +51,7 @@ MCP (Claude Code / Cursor) — `.mcp.json`:
 | `amu repo add <path\|owner/repo\|url>` / `list` / `use` / `remove` / `sync` / `amu cd <name>` | workspace: many repos, one active; `cd "$(amu cd twc-thugs)"` |
 | `amu find "<sentence>"` / `open <path\|sym>` / `tree [path]` / `neighbors <sym>` / `where <sym>` / `back` / `recent` | navigation, all backed by `entire graph search / def / symbols / neighbors` |
 | `amu graph <path#sym> [--depth 2] [--relation CALLS] [--format text\|json\|dot\|mermaid]` | relation graph: callers above, callees below, glyph per node; Mermaid/dot for PR descriptions |
-| `amu key set\|status\|remove` · `amu ask "<question>"` | Anthropic credential (0600 file, env, or `ant auth login`; never printed) and a model-driven Q&A over read-only graph tools (`claude-opus-5`, adaptive thinking) |
+| `amu key set [--provider …]\|status\|remove` · `amu ask "<question>"` | **Bring your own provider**: `anthropic` (default, `claude-opus-5`), `bedrock`, `vertex`, `foundry` via the official SDK clients, or any OpenAI-compatible endpoint (`ollama`, `lmstudio`, `openrouter`, `openai-compatible --base-url …`). Stored 0600, never printed. `ask` answers through read-only graph tools |
 | `amu watch [--phase N]` | live tree: `· planned ▸ editing ✓ green ✗ red ↯ drift` while you edit; never runs tests |
 | `amu brief --symbol <sym>` (hidden) | v0 3-bucket report kept for the noon-Curveball tests |
 
