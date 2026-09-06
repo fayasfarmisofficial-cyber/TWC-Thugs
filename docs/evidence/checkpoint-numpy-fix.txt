@@ -1,0 +1,20 @@
+Semantic changes f1757744c79233b3133b65a2d5fc6adcd36c8779..093c3dfdf7da2470cf7969c6164d59a3f3894b38
+
+amu/classify.py (Python)
+  ~ function build_map body changed (3 dependents)
+
+amu/cli.py (Python)
+  ~ function _do_map body changed (2 dependents)
+
+amu/entire.py (Python)
+  ~ function impact_json signature changed (1 dependent)
+
+tests/test_map.py (Python)
+  - function test_partial_parse_file_becomes_unknown_node removed (0 dependents)
+  + function test_syntax_error_file_in_root_package_becomes_unknown_node added
+  + function test_ambiguous_symbol_is_unknown_not_silent added
+
+Warnings
+  ! W_UNSUPPORTED_FILE amu/__pycache__/classify.cpython-313.pyc
+    file skipped; no parser for this file type, so its changes are not analyzed
+    base and head versions have no supported parser

@@ -1,3 +1,17 @@
 []
 []
 []
+[
+  {
+    "checkpoint_id": "01M1TZXJP22S864ME7QTF1MNRN",
+    "session_id": "d4f30598-d0b0-414e-bf84-640706b1a302",
+    "agent": "Claude Code",
+    "date": "2026-09-06T14:43:47+05:30",
+    "message": "fix(map): disambiguate impact by --file, query cached --head tree (80s→1s), aggregate repo-wide parse failures instead of one node per file (found on numpy)",
+    "is_logs_only": true,
+    "session_count": 1,
+    "session_ids": [
+      "d4f30598-d0b0-414e-bf84-640706b1a302"
+    ]
+  }
+]

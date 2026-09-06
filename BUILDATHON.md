@@ -36,10 +36,11 @@ Run tests: `pytest -q` (118 tests; the suite hides the real `entire` and replays
 | init-understanding | 34f6324 | none listed by `entire checkpoint list` (see note) | — | graph-first read before edits: docs/evidence/00–03 |
 | pre-curveball-stable | cc1c73b | none listed (see note) | — | loop closes end-to-end, 118 tests green |
 | curveball-response | — | — | — | not reached before the 15:00 deadline |
-| final-verification | chore(p8) commit on main | none listed (see note) | — | clean-checkout rehearsal in /tmp: clone → pip install -e . → 118 passed → amu init → amu map (docs/evidence/20-final-semantic-diff.txt) |
+| final-verification | 093c3df | **01M1TZXJP22S864ME7QTF1MNRN** (session d4f30598…) | `refs/entire/checkpoints/RN/01M1TZXJP22S864ME7QTF1MNRN` on origin | fix found by dogfooding on numpy, committed under the live hooks; `entire graph checkpoint` analysis in docs/evidence/checkpoint-numpy-fix.txt; clean-checkout rehearsal passed earlier (docs/evidence/20-final-semantic-diff.txt) |
 
 **Note (honest):** `entire enable --agent claude-code` was run at 14:12 IST *inside* an already-running Claude Code session.
-`entire doctor` reports hooks OK, but `entire checkpoint list --json` returned `[]` at every protocol run
+`entire doctor` reported hooks OK, but `entire checkpoint list --json` returned `[]` for the first three protocol runs; the first checkpoint
+(`01M1TZXJP22S864ME7QTF1MNRN`) only appeared on the commit made at 14:43 after the session had cycled through several turns
 (docs/evidence/checkpoints.jsonl, docs/evidence/checkpoint-diagnostic.txt). We did not fabricate IDs. The named checkpoint
 commits exist on `main` (`git log --grep checkpoint:`); if the session hooks flush later, `entire graph checkpoint <ID>` can
 be run against them.
@@ -56,6 +57,18 @@ The noon Curveball (partial analysis / dynamic dispatch) is covered by the v0 mo
 drops partial analysis, `check` degrades when `entire` is absent, cycles become warnings (tests/test_classify.py,
 test_plan.py, test_contract.py, test_amu.py untouched, still green). The afternoon Curveball response protocol (BUILD_PLAN.md
 Phase 6) was not executed — time ran out.
+
+## Tested on numpy (dogfood on a real repo, 6 Sep 14:35–14:45 IST)
+Shallow clone of numpy/numpy (`65b30cf`, 495 .py files + C/Fortran). `amu init`: 1666 files · 27,709 symbols · 97,968 relations ·
+**323 unparsed files reported up front** (Fortran, YAML, C headers). Mapping `numpy/_core/numeric.py#ones` found three real bugs, all fixed in `093c3df`:
+1. `build_map` crashed on `"entries": null` in empty impact sections.
+2. `ones` is defined twice (numeric.py and matlib.py) → impact returned `disambiguation_required` and zero edges; amu now passes `--file` and
+   marks a still-ambiguous symbol as an unknown node instead of silently reporting 0 consumers.
+3. Repo-wide parse failures were emitted as 323 unknown nodes; they now fold into the qualifier (`323 files unparsed repo-wide`) and only
+   syntax-error files in the root's own package *and* language become nodes.
+Also: querying the cached committed tree (`--head`) took the per-symbol impact from ~80 s to ~1 s.
+Result: `ones` → 6 sound consumers across 4 files, 0 guessed, 0 unknown with the qualifier; `plan --approve` → proceed; `check --phase 1` → 0 blocking;
+editing a phase-3 file (`numpy/lib/_polynomial_impl.py`) → PHASE_DRIFT + delta brief, exit 1; `amu done` → 26 memory entries written to numpy's CLAUDE.md.
 
 ## How amu builds on the Entire CLI (not beside it)
 `entire-amu` console script ⇒ `entire amu map …` dispatches through Entire's plugin mechanism (verified: `entire amu doctor`).
