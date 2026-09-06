@@ -109,7 +109,7 @@ def git_changed_files(repo: str = ".", base: str | None = None) -> list[str]:
         files.update(f for f in _git(["diff", "--name-only", base, "HEAD"], repo).splitlines() if f)
     files.update(f for f in _git(["diff", "--name-only", "HEAD"], repo).splitlines() if f)
     files.update(f for f in _git(["ls-files", "--others", "--exclude-standard"], repo).splitlines() if f)
-    return sorted(files)
+    return sorted(f for f in files if "__pycache__" not in f and not f.endswith((".pyc", ".DS_Store")))
 
 
 def repo_name(repo: str = ".") -> str:

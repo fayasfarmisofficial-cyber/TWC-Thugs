@@ -1,0 +1,177 @@
+TWC Thugs · amu map · TWC-Thugs
+amu/classify.py · 3 exports · feature Amu (map) · change signature
+├──   n1 ● sound will_break amu/cli.py#brief Amu via CALLS:amu/cli.py:168
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: amu verify --node n1
+├──   n2 ● sound will_break amu/cli.py#plan Amu via CALLS:amu/cli.py:187
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: amu verify --node n2
+├──   n3 ● sound will_break tests/test_amu.py#TestUnknownBucketRouting.test_dyna
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: pytest tests/test_amu.py::test_dynamic_dispatch_line_increments_
+├──   n4 ● sound will_break tests/test_amu.py#TestUnknownBucketRouting.test_mult
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: pytest tests/test_amu.py::test_multiple_dynamic_lines_all_counte
+├──   n5 ● sound will_break tests/test_amu.py#TestUnknownBucketRouting.test_dyna
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: pytest tests/test_amu.py::test_dynamic_dispatch_not_in_will_brea
+├──   n6 ● sound will_break tests/test_amu.py#TestUnknownBucketRouting.test_dyna
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: pytest tests/test_amu.py::test_dynamic_dispatch_not_in_might_bre
+├──   n7 ● sound will_break tests/test_amu.py#TestUnknownBucketRouting.test_unre
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: pytest tests/test_amu.py::test_unresolved_reference_routed_to_un
+├──   n8 ● sound will_break tests/test_amu.py#TestUnknownBucketRouting.test_part
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: pytest tests/test_amu.py::test_partial_analysis_notes_always_pre
+├──   n9 ● sound will_break tests/test_amu.py#TestUnknownBucketRouting.test_out_
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: pytest tests/test_amu.py::test_out_of_coverage_modules_propagate
+├──  n10 ● sound will_break tests/test_amu.py#TestUnknownBucketRouting.test_mixe
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: pytest tests/test_amu.py::test_mixed_output_routes_correctly
+├──  n11 ● sound will_break tests/test_amu.py#TestUnknownBucketRouting.test_unkn
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: pytest tests/test_amu.py::test_unknown_bucket_zero_counts_on_cle
+├──  n12 ● sound will_break tests/test_amu.py#TestUnknownBucketRouting.test_unkn
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: pytest tests/test_amu.py::test_unknown_bucket_structure_invarian
+├──  n13 ● sound will_break tests/test_amu.py#TestGraphFallbackSafety.test_impac
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: pytest tests/test_amu.py::test_impact_error_string_does_not_rais
+├──  n14 ● sound will_break tests/test_amu.py#TestGraphFallbackSafety.test_impac
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: pytest tests/test_amu.py::test_impact_multiline_unformatted_outp
+├──  n15 ● sound will_break tests/test_amu.py#TestGraphFallbackSafety.test_capab
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: pytest tests/test_amu.py::test_capabilities_result_feeds_classif
+├──  n16 ● sound will_break tests/test_classify.py#TestUnknownBucket.test_unknow
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: pytest tests/test_classify.py::test_unknown_bucket_always_presen
+├──  n17 ● sound will_break tests/test_classify.py#TestUnknownBucket.test_unknow
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: pytest tests/test_classify.py::test_unknown_bucket_has_required_
+├──  n18 ● sound will_break tests/test_classify.py#TestUnknownBucket.test_unknow
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: pytest tests/test_classify.py::test_unknown_unresolved_callsites
+├──  n19 ● sound will_break tests/test_classify.py#TestUnknownBucket.test_unknow
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: pytest tests/test_classify.py::test_unknown_out_of_coverage_prop
+├──  n20 ● sound will_break tests/test_classify.py#TestUnknownBucket.test_unknow
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: pytest tests/test_classify.py::test_unknown_notes_non_empty
+├──  n21 ● sound will_break tests/test_classify.py#TestUnknownBucket.test_unknow
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: pytest tests/test_classify.py::test_unknown_counts_zero_on_clean
+├──  n22 ● sound will_break tests/test_classify.py#TestWillBreakMightBreak.test_
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: pytest tests/test_classify.py::test_direct_hop_classified_as_wil
+├──  n23 ● sound will_break tests/test_classify.py#TestWillBreakMightBreak.test_
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: pytest tests/test_classify.py::test_transitive_hop_classified_as
+├──  n24 ● sound will_break tests/test_classify.py#TestWillBreakMightBreak.test_
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: pytest tests/test_classify.py::test_direct_keyword_classified_as
+├──  n25 ● sound will_break tests/test_classify.py#TestWillBreakMightBreak.test_
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: pytest tests/test_classify.py::test_transitive_keyword_classifie
+├──  n26 ● sound will_break tests/test_classify.py#TestWillBreakMightBreak.test_
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: pytest tests/test_classify.py::test_empty_output_yields_empty_wi
+├──  n27 ● sound will_break tests/test_classify.py#TestSafeFallback.test_empty_i
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: pytest tests/test_classify.py::test_empty_impact_output_does_not
+├──  n28 ● sound will_break tests/test_classify.py#TestSafeFallback.test_garbage
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: pytest tests/test_classify.py::test_garbage_impact_output_does_n
+├──  n29 ● sound will_break tests/test_classify.py#TestSafeFallback.test_error_p
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: pytest tests/test_classify.py::test_error_prefixed_output_does_n
+├──  n30 ● sound will_break tests/test_classify.py#TestSafeFallback.test_empty_c
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: pytest tests/test_classify.py::test_empty_caps_does_not_raise
+├──  n31 ● sound might_break amu/cli.py#_repl Amu via CALLS:amu/cli.py:529
+│   ├── reason: resolved CALLS edge at depth 2
+│   └── verify: amu verify --node n31
+├──  n32 ◐ guessed might_break amu/cli.py#cli.py Amu
+│   ├── reason: co-changes only, no resolved edge
+│   └── verify: amu verify --node n32
+├──  n33 ◐ guessed might_break amu/contract.py#contract.py Amu
+│   ├── reason: co-changes only, no resolved edge
+│   └── verify: amu verify --node n33
+├──  n34 ◐ guessed might_break amu/graph.py#graph.py Amu
+│   ├── reason: co-changes only, no resolved edge
+│   └── verify: amu verify --node n34
+├──  n35 ◐ guessed might_break amu/plan.py#plan.py Amu
+│   ├── reason: co-changes only, no resolved edge
+│   └── verify: amu verify --node n35
+├──  n36 ◐ guessed might_break pyproject.toml#pyproject.toml Root (derived)
+│   ├── reason: co-changes only, no resolved edge
+│   └── verify: amu verify --node n36
+├──  n37 ◐ guessed might_break tests/test_classify.py#test_classify.py Tests
+│   ├── reason: co-changes only, no resolved edge
+│   └── verify: pytest tests/test_classify.py::py
+├──  n38 ◐ guessed might_break tests/test_contract.py#test_contract.py Tests
+│   ├── reason: co-changes only, no resolved edge
+│   └── verify: pytest tests/test_contract.py::py
+├──  n39 ◐ guessed might_break tests/test_plan.py#test_plan.py Tests
+│   ├── reason: co-changes only, no resolved edge
+│   └── verify: pytest tests/test_plan.py::py
+├──  n40 ○ unknown unknown tests/fixtures/impact.json Tests
+│   ├── reason: E_MINIFIED: file record emitted but symbol parsing skipped
+│   └── verify: pytest tests/fixtures/impact.json
+├──  n41 ● sound will_break amu/cli.py#_do_map Amu via CALLS:amu/cli.py:141
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: amu verify --node n41
+├──  n42 ● sound will_break tests/test_honesty.py#_m Tests via CALLS:tests/test_
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: pytest tests/test_honesty.py::_m
+├──  n43 ● sound will_break tests/test_map.py#_map Tests via CALLS:tests/test_ma
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: pytest tests/test_map.py::_map
+├──  n44 ● sound might_break amu/cli.py#map Amu via CALLS:amu/cli.py:158
+│   ├── reason: resolved CALLS edge at depth 2
+│   └── verify: amu verify --node n44
+├──  n45 ● sound might_break tests/test_honesty.py#test_map_plan_contract_json_h
+│   ├── reason: resolved CALLS edge at depth 2
+│   └── verify: pytest tests/test_honesty.py::test_map_plan_contract_json_have_n
+├──  n46 ● sound might_break tests/test_honesty.py#test_rendered_map_has_no_bann
+│   ├── reason: resolved CALLS edge at depth 2
+│   └── verify: pytest tests/test_honesty.py::test_rendered_map_has_no_banned_wo
+├──  n47 ● sound might_break tests/test_honesty.py#test_schemas_validate Tests v
+│   ├── reason: resolved CALLS edge at depth 2
+│   └── verify: pytest tests/test_honesty.py::test_schemas_validate
+├──  n48 ● sound might_break tests/test_map.py#test_sound_needs_resolved_edge Te
+│   ├── reason: resolved CALLS edge at depth 2
+│   └── verify: pytest tests/test_map.py::test_sound_needs_resolved_edge
+├──  n49 ● sound might_break tests/test_map.py#test_every_non_sound_node_has_rea
+│   ├── reason: resolved CALLS edge at depth 2
+│   └── verify: pytest tests/test_map.py::test_every_non_sound_node_has_reason_a
+├──  n50 ● sound might_break tests/test_map.py#test_failed_impact_is_unknown_not
+│   ├── reason: resolved CALLS edge at depth 2
+│   └── verify: pytest tests/test_map.py::test_failed_impact_is_unknown_not_drop
+├──  n51 ● sound might_break tests/test_map.py#test_partial_parse_file_becomes_u
+│   ├── reason: resolved CALLS edge at depth 2
+│   └── verify: pytest tests/test_map.py::test_partial_parse_file_becomes_unknow
+├──  n52 ● sound might_break tests/test_map.py#test_zero_unknown_line_carries_qu
+│   ├── reason: resolved CALLS edge at depth 2
+│   └── verify: pytest tests/test_map.py::test_zero_unknown_line_carries_qualifi
+├──  n53 ● sound might_break tests/test_map.py#test_body_change_never_will_break
+│   ├── reason: resolved CALLS edge at depth 2
+│   └── verify: pytest tests/test_map.py::test_body_change_never_will_break
+├──  n54 ● sound might_break tests/test_map.py#test_next_is_runnable Tests via C
+│   ├── reason: resolved CALLS edge at depth 2
+│   └── verify: pytest tests/test_map.py::test_next_is_runnable
+├──  n55 ● sound will_break amu/classify.py#_feature_for Amu via CALLS:depth1
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: amu verify --node n55
+├──  n56 ● sound will_break amu/classify.py#_verify_for Amu via CALLS:depth1
+│   ├── reason: resolved CALLS edge at depth 1
+│   └── verify: amu verify --node n56
+└──  n57 ◐ guessed might_break amu/classify.py#add Amu
+    ├── reason: siblings only, no resolved edge
+    └── verify: amu verify --node n57
+features   Amu 12 · Tests 44 · Root (derived) 1
+radius     13 files · 3 packages · 3 exports · 56 consumers · 44 tests
+resolution 47 sound · 9 guessed · 1 unknown — 0 unresolved impact queries, 1 partially parsed files
+next       amu plan --targets amu/classify.py#classify_consumers:signature --approve

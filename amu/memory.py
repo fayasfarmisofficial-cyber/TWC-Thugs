@@ -62,6 +62,8 @@ def collect(repo: str = ".") -> list[dict]:
     total = max(len(st.get("history", [])), 1)
     for sym, hits in sorted(reds.items(), key=lambda kv: -len(kv[1])):
         f = sym.split("#")[0]
+        if "__pycache__" in f or f.endswith(".pyc"):
+            continue
         entries.append(_entry("hot_spot", f"`{sym}` — red {len(hits)}/{total} · last: {hits[-1][0]} (chk {hits[-1][1] or 'n/a'}) · verify: amu check", [sym], repo, f))
     freq: dict[str, int] = {}
     n_contracts = 0

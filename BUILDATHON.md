@@ -2,9 +2,9 @@
 
 Track: Entire main challenge · Track 2 Graph Intelligence
 Fork/repo: https://github.com/fayasfarmisofficial-cyber/TWC-Thugs
-Final commit SHA: the commit after cc1c73b titled `chore(p8): buildathon submission` (`git rev-parse HEAD` on main)
-Project URL (Vercel): not deployed — the CLI runs locally next to the repo (Phase 7 web page was cut for time; the MCP server `amu/mcp_server.py` and `scripts/install.sh` are in place).
-Demo: docs/DEMO.md · recorded outputs in docs/evidence/
+Final commit SHA: the latest commit on `main` (`git rev-parse HEAD`); submission commits are `chore(p8): buildathon submission` and `feat(p7): static web card + install page`.
+Project URL (Vercel): not deployed by the deadline — `web/` is a zero-config static site (import the repo in Vercel, root dir `web/`, output `public/`): `/` install page, `/card` agent-card viewer that renders `amu map --json`, `/install.sh`. The CLI itself runs locally next to the repo; the MCP server `amu/mcp_server.py` wraps it for Claude Code / Cursor.
+Demo: docs/DEMO.md · text captures of every command in docs/screenshots/ (asciinema not available on the build machine) · raw graph outputs in docs/evidence/
 
 ## Environment
 Entire CLI 0.10.5 · entire-graph plugin v0.4.0 · Python 3.13.9 · macOS arm64 · installed via `brew tap entireio/tap && brew trust entireio/tap && brew install --cask entire && entire plugin install graph`.
@@ -78,7 +78,7 @@ Every graph fact is an `entire graph …` call routed through `amu/entire.py`; n
 Not applicable.
 
 ## What's next
-Vercel agent card + report API (web/), `amu done --publish`, `verify --attempt-fallback` with SCIP, `docs --mode auto` in CI,
+Deploy web/ to Vercel + `/api/report` for `amu done --publish`, `verify --attempt-fallback` with SCIP, `docs --mode auto` in CI,
 mapper ripple review, live checkpoint ids once the session hooks flush.
 
 (No secrets. Model key is read from ANTHROPIC_API_KEY at runtime; roles run in manual mode without it.)

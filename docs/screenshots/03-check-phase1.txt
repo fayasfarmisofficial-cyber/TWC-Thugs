@@ -1,0 +1,8 @@
+TWC Thugs · amu check · TWC-Thugs
+phase 1 · changed files 3 · blocking 3 · warnings 0
+  ✖ OUT_OF_SCOPE docs/screenshots/01-map.txt: file is not in the contract's allowed_files
+  ✖ OUT_OF_SCOPE docs/screenshots/02-plan-approve.txt: file is not in the contract's allowed_files
+  ✖ OUT_OF_SCOPE docs/screenshots/03-check-phase1.txt: file is not in the contract's allowed_files
+delta brief: docs/screenshots/01-map.txt · consumers 0 · file is not in the contract's allowed_files
+next       fix the delta brief, then re-run
+exit=1

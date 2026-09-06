@@ -19,6 +19,8 @@ pytest -q                            # 118 tests, no real `entire` needed (tests
 `entire amu map --file amu/plan.py` works the same way: the `entire-amu` entrypoint is dispatched by the Entire CLI.
 Interactive: `amu` (no args) opens the TWC Thugs REPL — `/map /plan /approve /check N /done /docs /verify nX /why nX`.
 
+Web (Vercel, static): `web/public` — `/` install page, `/card` agent-card viewer for `amu map --json`. Import the repo with root dir `web/`.
+
 MCP (Claude Code / Cursor) — `.mcp.json`:
 ```json
 {"mcpServers": {"amu": {"command": "python", "args": ["-m", "amu.mcp_server"]}}}
