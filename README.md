@@ -17,7 +17,7 @@ pytest -q                            # 118 tests, no real `entire` needed (tests
 ```
 
 `entire amu map --file amu/plan.py` works the same way: the `entire-amu` entrypoint is dispatched by the Entire CLI.
-Interactive: `amu` (no args) opens the TWC Thugs REPL (gold identity, tab-completion for repos and symbols) — `/map /plan /approve /check N /done /docs /verify nX /why nX /repo /use /find /open /tree /graph /back`; a bare path or symbol is an `explore`; with a credential, any other free text goes to the model, which answers through the graph tools and proposes the next amu command.
+Interactive: `amu` (no args) opens the TWC Thugs REPL (gold identity, tab-completion for repos and symbols) — `/map /plan /approve /check N /done /docs /verify nX /why nX /feature X /skills /repo /use <name> /find <words> /open <sym> /tree [path] /graph <sym> /back /ask <question> /key`; a bare path or symbol is an `explore`; with a credential, any other free text goes to the model, which answers through the graph tools and proposes the next amu command.
 
 Web (Vercel, static): `web/public` — `/` install page, `/card` agent-card viewer for `amu map --json`, `/graph` d3-force viewer for `amu graph --format json`. Same five gold tokens as the terminal. Import the repo with root dir `web/`.
 
@@ -44,6 +44,35 @@ MCP (Claude Code / Cursor) — `.mcp.json`:
 | `amu key set\|status\|remove` · `amu ask "<question>"` | Anthropic credential (0600 file, env, or `ant auth login`; never printed) and a model-driven Q&A over read-only graph tools (`claude-opus-5`, adaptive thinking) |
 | `amu watch [--phase N]` | live tree: `· planned ▸ editing ✓ green ✗ red ↯ drift` while you edit; never runs tests |
 | `amu brief --symbol <sym>` (hidden) | v0 3-bucket report kept for the noon-Curveball tests |
+
+## REPL Slash Commands
+
+`amu` (no args) drops into an interactive REPL. Type `/help` at the prompt to see this list:
+
+| Slash command | What it does |
+|---|---|
+| `/map <file>` | Blast map for a file |
+| `/plan` | Draft refactor plan |
+| `/approve` | Write `.amu/contract.json` |
+| `/check N` | Check phase N |
+| `/done` | Full close-the-loop |
+| `/docs` | Doc-staleness surface |
+| `/verify nX` | Run a node's verify path |
+| `/why nX` | Explain a node (raw JSON) |
+| `/feature X` | Look up a feature in the feature map |
+| `/skills` | List available skills |
+| `/repo` | List workspace repos |
+| `/use <name>` | Switch active repo |
+| `/find <words>` | Graph search |
+| `/open <sym>` | Open a symbol or path |
+| `/tree [path]` | Directory tree (depth 2) |
+| `/graph <sym>` | Relation graph for a symbol |
+| `/back` | Navigation history — go back |
+| `/ask <question>` | Ask the AI model (requires `amu key set`) |
+| `/key` | Show model key/credential status |
+| `/help` | Show this command list |
+
+A bare path or symbol triggers `explore` (opens it). Any other free text routes to the model when a key is set.
 
 ## Architecture
 
