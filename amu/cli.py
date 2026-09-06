@@ -12,7 +12,7 @@ from pathlib import Path
 
 import typer
 
-from amu import __version__, brand, entire, graphview, memory, render, router, state, workspace
+from amu import __version__, brand, entire, graphview, keys, memory, render, router, state, workspace
 from amu import docs as docsmod
 from amu import watch as watchmod
 from amu.classify import build_map, classify_consumers
@@ -29,7 +29,7 @@ app.add_typer(memory_app, name="memory")
 app.add_typer(skills_app, name="skills")
 
 JSON_OPT = typer.Option(False, "--json", help="machine-readable output (branding suppressed)")
-_NO_REPO_NEEDED = {"doctor", "list", "run", "add", "use", "remove", "sync", "cd", None}
+_NO_REPO_NEEDED = {"doctor", "list", "run", "add", "use", "remove", "sync", "cd", "set", "status", None}
 
 
 def _resolve_repo_cb(ctx: typer.Context, value: str | None) -> str:
@@ -46,6 +46,8 @@ def _resolve_repo_cb(ctx: typer.Context, value: str | None) -> str:
 REPO_OPT = typer.Option(None, "--repo", help="repository path (default: repo containing $PWD, else the active workspace repo)", callback=_resolve_repo_cb)
 repo_app = typer.Typer(help="workspace: add / list / use / remove / sync repos")
 app.add_typer(repo_app, name="repo")
+key_app = typer.Typer(help="model credential: set / status / remove (value is never printed)")
+app.add_typer(key_app, name="key")
 
 
 def _out(obj, json_mode: bool):
@@ -126,11 +128,12 @@ def doctor(repo: str = REPO_OPT, json_output: bool = JSON_OPT):
     brand.header("doctor", state.repo_name(repo), json_output)
     ok = entire.available() and entire.graph_available()
     d = {"entire": entire.version(), "graph": entire.graph_version(), "doctor": entire.doctor() if ok else {"error": "entire missing"},
-         "anthropic_key_present": bool(os.environ.get("ANTHROPIC_API_KEY")), "unparsed": state.config(repo).get("unparsed", []),
+         "anthropic_key_present": keys.available(), "anthropic_key_source": keys.source(), "model": state.config(repo).get("model", "claude-opus-5"),
+         "unparsed": state.config(repo).get("unparsed", []),
          "install": None if ok else entire.INSTALL_HINT}
     _out(d, json_output)
     if not json_output:
-        typer.echo(f"entire {d['entire']} · graph {d['graph']} · model key {'present' if d['anthropic_key_present'] else 'absent (manual mode)'} · unparsed {len(d['unparsed'])}")
+        typer.echo(f"entire {d['entire']} · graph {d['graph']} · model {d['model']} · credential {d['anthropic_key_source'] if d['anthropic_key_present'] else 'absent (manual mode) → amu key set'} · unparsed {len(d['unparsed'])}")
         if not ok:
             typer.echo(f"install: {entire.INSTALL_HINT}")
     if not ok:
@@ -741,6 +744,55 @@ def watch_cmd(phase: int = typer.Option(None, "--phase"), no_live: bool = typer.
 
 
 # ---------------------------------------------------------------------------
+# key: set / status / remove  (the value is never echoed, logged, or committed)
+# ---------------------------------------------------------------------------
+
+@key_app.command("set")
+def key_set(value: str = typer.Option(None, "--value", help="pass the key non-interactively (prefer the hidden prompt or ANTHROPIC_API_KEY)"),
+            json_output: bool = JSON_OPT):
+    """Store the Anthropic API key in ~/.amu/credentials.json (mode 0600)."""
+    brand.header("key set", "~/.amu", json_output)
+    v = value or typer.prompt("Anthropic API key", hide_input=True)
+    try:
+        path = keys.set_key(v)
+    except ValueError as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(code=2)
+    out = {"stored": path, "source": keys.source(), "masked": keys.masked()}
+    _out(out, json_output)
+    if not json_output:
+        typer.echo(f"stored     {path} (0600) · {out['masked']} · run `amu` for the interactive session")
+
+
+@key_app.command("status")
+def key_status(json_output: bool = JSON_OPT):
+    out = {"source": keys.source(), "masked": keys.masked() if keys.available() else None, "model": state.config(".").get("model", "claude-opus-5")}
+    _out(out, json_output)
+    if not json_output:
+        typer.echo(f"credential {out['source']}" + (f" · {out['masked']}" if out['masked'] else " · run `amu key set` or export ANTHROPIC_API_KEY") + f" · model {out['model']}")
+
+
+@key_app.command("remove")
+def key_remove():
+    typer.echo("removed ~/.amu/credentials.json" if keys.remove_key() else "no stored key (ANTHROPIC_API_KEY, if set, is untouched)")
+
+
+@app.command()
+def ask(question: str, no_stream: bool = typer.Option(False, "--no-stream"), repo: str = REPO_OPT, json_output: bool = JSON_OPT):
+    """Ask the model about this repo; it answers through the graph tools (read-only) and proposes the next amu command."""
+    from amu.harness.chat import Assistant
+    brand.header("ask", state.repo_name(repo), json_output)
+    a = Assistant(repo, out=(lambda t: None) if (json_output or no_stream) else None, stream=not (json_output or no_stream))
+    answer = a.ask(question)
+    if json_output:
+        typer.echo(json.dumps({"question": question, "answer": answer, "model": a.model, "turns": len(a.messages)}))
+    elif no_stream:
+        typer.echo(answer)
+    else:
+        typer.echo("")
+
+
+# ---------------------------------------------------------------------------
 # memory / skills / repl
 # ---------------------------------------------------------------------------
 
@@ -860,6 +912,9 @@ def _repl(repo: str | None = None):
         typer.echo(str(exc), err=True)
         raise typer.Exit(code=exc.code)
     brand.banner(__version__, state.repo_name(repo), f"{'enabled' if entire.available() else 'missing'} · graph {entire.graph_version()}")
+    from amu.harness.chat import Assistant
+    assistant = Assistant(repo) if keys.available() else None
+    brand.err_console().print(f"[brand.muted]model {'ready · ' + assistant.model if assistant else 'manual mode — amu key set to make the session interactive'}[/]")
     lookup = _lookup_factory(repo)
     while True:
         try:
@@ -889,7 +944,9 @@ def _repl(repo: str | None = None):
                     "tree": lambda: tree(arg or ".", depth=2, repo=repo, json_output=False),
                     "back": lambda: back(repo=repo, json_output=False),
                     "graph": lambda: graph(arg, depth=2, relation=None, fmt="text", repo=repo, json_output=False),
-                    "help": lambda: typer.echo("/map <file> /plan /approve /check N /done /docs /verify nX /why nX /feature X /skills /repo /use <name> /find <words> /open <sym> /tree [path] /graph <sym> /back — or describe the change in words")}
+                    "ask": lambda: (typer.echo(assistant.ask(arg)) if not assistant or not arg else (assistant.ask(arg), typer.echo(""))),
+                    "key": lambda: key_status(json_output=False),
+                    "help": lambda: typer.echo("/map <file> /plan /approve /check N /done /docs /verify nX /why nX /feature X /skills /repo /use <name> /find <words> /open <sym> /tree [path] /graph <sym> /back /ask <question> /key — or just talk: a change request maps it, anything else goes to the model")}
             try:
                 cmds.get(r["intent"], cmds["help"])()
                 if r["intent"] == "use" and workspace.get(arg):
@@ -911,8 +968,12 @@ def _repl(repo: str | None = None):
                 render.render_map(_do_map(repo, None, f"{t['path']}#{t['symbol']}", 2, r["change_class"]))
             except typer.Exit:
                 pass
+        elif assistant:
+            hint = f" (router: {r['status']}{', ambiguous ' + str(r.get('ambiguous')) if r.get('ambiguous') else ''})"
+            assistant.ask(line + hint)
+            typer.echo("")
         else:
-            typer.echo(f"router: {r['status']} — name the symbol exactly as `entire graph search` reports it" + (f" (ambiguous: {r.get('ambiguous')})" if r.get("ambiguous") else ""))
+            typer.echo(f"router: {r['status']} — name the symbol exactly as `entire graph search` reports it" + (f" (ambiguous: {r.get('ambiguous')})" if r.get("ambiguous") else "") + " · `amu key set` enables free-text questions")
 
 
 if __name__ == "__main__":

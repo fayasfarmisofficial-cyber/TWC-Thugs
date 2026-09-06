@@ -95,7 +95,7 @@ def collect(repo: str = ".") -> list[dict]:
     m = state.read_json("map.json", repo)
     if m:
         for n in m["nodes"]:
-            if n["confidence"] == "unknown":
+            if n.get("confidence") == "unknown":
                 entries.append(_entry("open_question", f"{n['id']} {n['path']} {n['reason']} → {n['verify']}", [n["id"]], repo, n["path"]))
     cfg = state.read_json("config.json", repo, default={})
     for f in cfg.get("unparsed", [])[:MAX_PER_SECTION]:

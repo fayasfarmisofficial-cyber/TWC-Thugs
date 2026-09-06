@@ -23,6 +23,8 @@ TOOL_MATRIX = {
     "sweeper": {"graph.diff", "graph.impact", "contract.read", "memory.read"},
     "doc_agent": {"graph.diff", "docs.read", "docs.draft"},
     "memory": {"state.read", "contract.read", "run.read", "memory.write"},
+    # interactive assistant: read-only graph + amu commands; no source writes, no contract writes
+    "assistant": {"chat.graph_search", "chat.graph_def", "chat.amu_map", "chat.amu_graph", "chat.amu_where", "chat.amu_state", "chat.read_lines", "chat.answer_unknown"},
 }
 
 

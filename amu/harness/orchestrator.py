@@ -39,7 +39,7 @@ class Orchestrator:
             d = {"decision": "proceed", "confidence": 0.8 if not hot else 0.7, "escalate": False,
                  "evidence": [f"sound {res['sound']}", f"guessed {res['guessed']}"] + hot[:3], "next": amu_map["next"]}
         if model.available():
-            m = model.ask_json(system_prompt("planner"), state.json.dumps({"map": amu_map, "hot_spots": hot}))
+            m = model.ask_json(system_prompt("planner"), state.json.dumps({"map": amu_map, "hot_spots": hot}), model.model_id(self.repo))
             if m.get("decision") in ("proceed", "narrow", "ask"):
                 d = m
         return self.handoff("planner", d)

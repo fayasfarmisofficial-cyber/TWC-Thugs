@@ -17,7 +17,7 @@ pytest -q                            # 118 tests, no real `entire` needed (tests
 ```
 
 `entire amu map --file amu/plan.py` works the same way: the `entire-amu` entrypoint is dispatched by the Entire CLI.
-Interactive: `amu` (no args) opens the TWC Thugs REPL (gold identity, tab-completion for repos and symbols) — `/map /plan /approve /check N /done /docs /verify nX /why nX /repo /use /find /open /tree /graph /back`; a bare path or symbol is an `explore`.
+Interactive: `amu` (no args) opens the TWC Thugs REPL (gold identity, tab-completion for repos and symbols) — `/map /plan /approve /check N /done /docs /verify nX /why nX /repo /use /find /open /tree /graph /back`; a bare path or symbol is an `explore`; with a credential, any other free text goes to the model, which answers through the graph tools and proposes the next amu command.
 
 Web (Vercel, static): `web/public` — `/` install page, `/card` agent-card viewer for `amu map --json`, `/graph` d3-force viewer for `amu graph --format json`. Same five gold tokens as the terminal. Import the repo with root dir `web/`.
 
@@ -41,6 +41,7 @@ MCP (Claude Code / Cursor) — `.mcp.json`:
 | `amu repo add <path\|owner/repo\|url>` / `list` / `use` / `remove` / `sync` / `amu cd <name>` | workspace: many repos, one active; `cd "$(amu cd twc-thugs)"` |
 | `amu find "<sentence>"` / `open <path\|sym>` / `tree [path]` / `neighbors <sym>` / `where <sym>` / `back` / `recent` | navigation, all backed by `entire graph search / def / symbols / neighbors` |
 | `amu graph <path#sym> [--depth 2] [--relation CALLS] [--format text\|json\|dot\|mermaid]` | relation graph: callers above, callees below, glyph per node; Mermaid/dot for PR descriptions |
+| `amu key set\|status\|remove` · `amu ask "<question>"` | Anthropic credential (0600 file, env, or `ant auth login`; never printed) and a model-driven Q&A over read-only graph tools (`claude-opus-5`, adaptive thinking) |
 | `amu watch [--phase N]` | live tree: `· planned ▸ editing ✓ green ✗ red ↯ drift` while you edit; never runs tests |
 | `amu brief --symbol <sym>` (hidden) | v0 3-bucket report kept for the noon-Curveball tests |
 

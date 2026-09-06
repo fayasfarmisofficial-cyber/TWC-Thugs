@@ -71,7 +71,7 @@ def write_json(name: str, obj: Any, repo: str = ".", kind: str | None = None) ->
 def config(repo: str = ".") -> dict:
     return read_json("config.json", repo, default={
         "language": "unknown", "test_cmd": "pytest -q", "build_cmd": "", "docs_dir": "docs",
-        "docs": {"mode": "draft"}, "model": "claude-sonnet-4-6", "web": {"report_url": ""},
+        "docs": {"mode": "draft"}, "model": "claude-opus-5", "web": {"report_url": ""},
     })
 
 

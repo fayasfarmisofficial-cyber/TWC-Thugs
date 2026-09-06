@@ -15,7 +15,7 @@ CLASS_RULES = [
 ]
 SLASH = {"/map": "map", "/plan": "plan", "/approve": "approve", "/check": "check", "/done": "done", "/docs": "docs",
          "/verify": "verify", "/why": "why", "/feature": "feature", "/skills": "skills", "/help": "help",
-         "/repo": "repo", "/use": "use", "/find": "find", "/open": "open", "/tree": "tree", "/back": "back", "/graph": "graph"}
+         "/repo": "repo", "/use": "use", "/find": "find", "/open": "open", "/tree": "tree", "/back": "back", "/graph": "graph", "/ask": "ask", "/key": "key"}
 _EXPLORE_RX = re.compile(r"^[A-Za-z0-9_./#-]+$")
 
 

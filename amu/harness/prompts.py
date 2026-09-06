@@ -17,6 +17,7 @@ ROLES = {
     "checker": "Given a check result with violations, decide retry | widen | escalate. You cannot downgrade a blocking violation to a warning.",
     "sweeper": "Given a diff since base_sha and the contract, list every changed public export outside the contract as a finding with bucket, confidence, reason and verify.",
     "doc_agent": "Given a doc candidate packet, judge whether the draft is consistent with the diff and list concerns; you never claim docs are up to date.",
+    "assistant": "Interactive helper in the REPL. Use the graph tools to answer; propose the exact next amu command; never claim more than the graph edge supports.",
     "memory": "Given sources (state, contracts, answers, sweep findings), propose memory entries as pointers, counts and one-line answers only — never prompts, transcripts, secrets or source text.",
 }
 
