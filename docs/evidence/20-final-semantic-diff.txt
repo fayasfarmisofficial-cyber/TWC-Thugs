@@ -1,0 +1,564 @@
+Semantic changes 34f6324..HEAD
+
+.amu/config.json (JSON)
+  + section language added
+  + section test_cmd added
+  + section build_cmd added
+  + section docs_dir added
+  + section docs added
+  + section mode added
+  + section model added
+  + section web added
+  + section report_url added
+  + section languages added
+  + section unparsed added
+
+.amu/doc-map.json (JSON)
+  + module .amu/doc-map.json added
+
+.amu/feature_map.json (JSON)
+  + section Amu added
+  + section Amu.egg-info added
+  + section Docs added
+  + section Scripts added
+  + section Tests added
+
+.amu/skills/conventions/SKILL.md (Markdown)
+  + section conventions added
+
+.amu/skills/run-tests/SKILL.md (Markdown)
+  + section run-tests added
+
+AGENTS.md (Markdown)
+  + section What-amu-has-learned-about-this-repo-TWC-Thugs-updated-2026-09-06T08:56:57Z-checkpoint-none-yet added
+  + section Hot-spots-history:-went-red-in-past-checks added
+  + section Frozen-/-risky-interfaces-from-approved-contracts added
+  + section Features-paths added
+  + section Conventions-the-graph-confirmed added
+  + section Open-questions-carry-into-the-next-task added
+
+BUILDATHON.md (Markdown)
+  - section Anti-Messup-Agent-amu removed (0 dependents)
+  + section amu-Anti-Messup-BUILDATHON-TWC-Thugs added
+  - section 1.-Problem-Track-2-Fit removed (0 dependents)
+  - section The-Problem-Silent-AI-Agent-Breakage removed (0 dependents)
+  + section Environment added
+  + section Problem-and-innovation added
+  - section Track-2-Fit-entire-graph-at-the-Core removed (0 dependents)
+  + section Setup-/-Run-clean-checkout added
+  - section 2.-Noon-Curveball-Adaptation-Partial-Analysis-Dynamic-Dispatch removed (0 dependents)
+  + section Entire-Checkpoints added
+  - section Our-Solution:-The-unknown-Bucket removed (0 dependents)
+  + section Entire-Graph-evidence added
+  - code_fence code_fence_2_text removed (0 dependents)
+  + section Response-to-the-Curveball added
+  - section Design-Decisions removed (0 dependents)
+  + section How-amu-builds-on-the-Entire-CLI-not-beside-it added
+  - section Curveball-Compliance-Contract-for-AI-Agents removed (0 dependents)
+  + section Tests added
+  - code_fence code_fence_3_python removed (0 dependents)
+  - code_fence code_fence_4_text removed (0 dependents)
+  ~ section Databricks renamed from Installation (0 dependents)
+  - section 3.-Architecture-Overview removed (0 dependents)
+  + section What-s-next added
+  - code_fence code_fence_5_text removed (0 dependents)
+  - code_fence code_fence_6_text removed (0 dependents)
+  - section amu-brief-Blast-Radius-Analysis removed (0 dependents)
+  - code_fence code_fence_7_text removed (0 dependents)
+  - code_fence code_fence_8_text removed (0 dependents)
+  - section amu-plan-Topological-4-Phase-Refactoring-Sequence removed (0 dependents)
+  - section amu-check-Contract-Guardrail-CI-Gate removed (0 dependents)
+  - section 4.-Setup-Usage removed (0 dependents)
+  - section Clone-the-repo removed (0 dependents)
+  - section Install-with-dev-dependencies removed (0 dependents)
+  - code_fence code_fence_10_text removed (0 dependents)
+  - section amu-brief-Pre-edit-impact-analysis removed (0 dependents)
+  - code_fence code_fence_11_bash removed (0 dependents)
+  - section Human-readable-output removed (0 dependents)
+  - section JSON-for-agent-consumption removed (0 dependents)
+  - code_fence code_fence_12_text removed (0 dependents)
+  - section amu-plan-Generate-safe-refactoring-sequence removed (0 dependents)
+  - code_fence code_fence_13_bash removed (0 dependents)
+  - section Pretty-print-the-4-phase-plan removed (0 dependents)
+  - section JSON-output-pipe-into-your-agent removed (0 dependents)
+  - code_fence code_fence_14_text removed (0 dependents)
+  - section amu-check-Run-contract-guardrail removed (0 dependents)
+  - code_fence code_fence_15_bash removed (0 dependents)
+  - section Basic-check-between-main-and-HEAD removed (0 dependents)
+  - section With-frozen-symbols-declared-scope-and-planned-removals removed (0 dependents)
+  - section Strict-mode:-treat-missing-entire-CLI-as-a-hard-failure-for-enforced-CI removed (0 dependents)
+  - code_fence code_fence_16_text removed (0 dependents)
+  - section Run-the-Test-Suite removed (0 dependents)
+  - code_fence code_fence_17_bash removed (0 dependents)
+  - section All-72-tests removed (0 dependents)
+  - section Verbose-with-coverage removed (0 dependents)
+  - code_fence code_fence_18_text removed (0 dependents)
+  - code_fence code_fence_19_text removed (0 dependents)
+  - code_fence code_fence_20_text removed (0 dependents)
+  - section 5.-Entire-Checkpoints removed (0 dependents)
+  - code_fence code_fence_21_bash removed (0 dependents)
+  - section Copy-the-ID-from-the-output-and-paste-it-into-the-table-above removed (0 dependents)
+  - code_fence code_fence_22_text removed (0 dependents)
+  - section 6.-Why-amu-Wins-Track-2 removed (0 dependents)
+
+CLAUDE.md (Markdown)
+  + section What-amu-has-learned-about-this-repo-TWC-Thugs-updated-2026-09-06T08:56:57Z-checkpoint-none-yet added
+  + section Hot-spots-history:-went-red-in-past-checks added
+  + section Frozen-/-risky-interfaces-from-approved-contracts added
+  + section Features-paths added
+  + section Conventions-the-graph-confirmed added
+  + section Open-questions-carry-into-the-next-task added
+
+README.md (Markdown)
+  - section Commands removed (1 dependent)
+  + section Setup-/-Run-from-a-clean-checkout added
+  ~ code_fence code_fence_1_bash (renamed from code_fence_9_bash) moved from BUILDATHON.md (0 dependents)
+  ~ code_fence code_fence_3_json (renamed from code_fence_1_json) moved from BUILDATHON.md (0 dependents)
+  + code_fence code_fence_4_text added
+  + section Commands-v0.2 added
+  ~ code_fence code_fence_5_text renamed from code_fence_1_text (0 dependents)
+  + code_fence code_fence_6_text added
+
+amu/__init__.py (Python)
+  ~ module amu/__init__.py body changed (0 dependents)
+
+amu/brand.py (Python)
+  + function color_enabled added
+  + function _magenta added
+  + function header added
+  + function banner added
+  + function status_line added
+
+amu/classify.py (Python)
+  + function _feature_for added
+  + function _verify_for added
+  + function build_map added
+  + function add added
+
+amu/cli.py (Python)
+  + function _out added
+  + function _need_entire added
+  + function _lookup_factory added
+  + function lookup added
+  + function main added
+  + function init added
+  + function doctor added
+  + function _do_map added
+  + function map added
+  ~ function brief signature changed (10 dependents)
+  ~ function plan signature changed (32 dependents)
+  + function _run_tests added
+  ~ function check signature changed (10 dependents)
+  + function verify added
+  + function _sweep added
+  + function sync added
+  + function sweep added
+  + function docs_cmd added
+  + function done added
+  + function memory_refresh added
+  + function memory_show added
+  + function memory_pin added
+  + function memory_unpin added
+  + function memory_forget added
+  + function stale added
+  + function _skill_dirs added
+  + function skills_list added
+  + function skills_run added
+  + function skills_add added
+  + function _repl added
+
+amu/contract.py (Python)
+  ~ class ViolationKind body changed (21 dependents)
+  ~ class ContractResult body changed (3 dependents)
+  ~ method ContractResult.pretty body changed (6 dependents)
+  ~ function _parse_diff body changed (7 dependents)
+  + function parse_graph_diff added
+  + function check_contract added
+
+amu/docs.py (Python)
+  + function doc_map added
+  + function draft_doc_map added
+  + function candidates added
+  + function other_mentions added
+  + function draft added
+  + function packet added
+  + function apply added
+
+amu/entire.py (Python)
+  + function _run added
+  + function _json added
+  + function available added
+  + function graph_available added
+  + function version added
+  + function graph_version added
+  + function index added
+  + function snapshot added
+  + function capabilities added
+  + function search added
+  + function definition added
+  + function impact_json added
+  + function impact_text added
+  + function neighbors_json added
+  + function diff_json added
+  + function diff_text added
+  + function symbols added
+  + function verify added
+  + function doctor added
+  + function checkpoint_list added
+  + function graph_checkpoint added
+  + function status_text added
+
+amu/graph.py (Python)
+  ~ function impact body changed (18 dependents)
+  ~ function capabilities body changed (13 dependents)
+
+amu/harness/model.py (Python)
+  + function available added
+  + function ask_json added
+
+amu/harness/orchestrator.py (Python)
+  + class Orchestrator added
+  + method Orchestrator.__init__ added
+  + method Orchestrator.handoff added
+  + method Orchestrator.answered added
+  + method Orchestrator.plan_decision added
+  + method Orchestrator.phase_brief added
+  + method Orchestrator.brief_markdown added
+  + method Orchestrator.on_check added
+
+amu/harness/prompts.py (Python)
+  + function system_prompt added
+
+amu/harness/roles.py (Python)
+  + class ToolNotGranted added
+  + class WriteRefused added
+  + class Role added
+  + method Role.call added
+  + method Role.write_path added
+  + function make_role added
+  + class Budget added
+  + method Budget.__init__ added
+  + method Budget.spend added
+  + method Budget.as_str added
+  + function checker_decide added
+
+amu/mcp_server.py (Python)
+  + function _cli added
+  + function main added
+
+amu/memory.py (Python)
+  + class MemoryRejected added
+  + function _entry added
+  + function _checkpoint_id added
+  + function collect added
+  + function render_block added
+  + function write_block added
+  + function refresh added
+  + function pin added
+  + function forget added
+
+amu/plan.py (Python)
+  + function plan_from_map added
+  + function make_contract added
+
+amu/render.py (Python)
+  + function _console added
+  + function _narrow added
+  + function render_map added
+  + function render_plan added
+  + function render_check added
+  + function render_findings added
+  + function render_report added
+  + function agent_card added
+
+amu/router.py (Python)
+  + function change_class added
+  + function candidate_tokens added
+  + function route added
+
+amu/skills/close-the-loop/SKILL.md (Markdown)
+  + section Finish-a-task added
+  + section When-to-use added
+  + section Steps added
+  + section Done-when added
+
+amu/skills/doc-follow/SKILL.md (Markdown)
+  + section Docs-that-follow-the-graph added
+  + section When-to-use added
+  + section Steps added
+  + section Done-when added
+
+amu/skills/feature-rollup/SKILL.md (Markdown)
+  + section Group-by-feature added
+  + section When-to-use added
+  + section Steps added
+  + section Done-when added
+
+amu/skills/map-a-change/SKILL.md (Markdown)
+  + section Map-before-you-touch-anything added
+  + section When-to-use added
+  + section Steps added
+  + section Done-when added
+
+amu/skills/memory-renovate/SKILL.md (Markdown)
+  + section What-goes-into-memory added
+  + section When-to-use added
+  + section Steps added
+  + section Done-when added
+
+amu/skills/phase-edit/SKILL.md (Markdown)
+  + section Edit-exactly-one-phase added
+  + section When-to-use added
+  + section Steps added
+  + section Done-when added
+
+amu/skills/red-triage/SKILL.md (Markdown)
+  + section What-to-do-when-check-is-red added
+  + section When-to-use added
+  + section Steps added
+  + section Done-when added
+
+amu/skills/unknowns/SKILL.md (Markdown)
+  + section Handling-unknown-nodes added
+  + section When-to-use added
+  + section Steps added
+  + section Done-when added
+
+amu/state.py (Python)
+  + class SchemaError added
+  + function validate added
+  + function amu_dir added
+  + function read_json added
+  + function write_json added
+  + function config added
+  + function now_iso added
+  + function stable_hash added
+  + function file_hash added
+  + function _git added
+  + function git_head added
+  + function git_changed_files added
+  + function repo_name added
+  + function detect_commands added
+
+docs/DEMO.md (Markdown)
+  + section amu-3-minute-demo-script-TWC-Thugs added
+
+docs/evidence/11-amu-map-classify.json (JSON)
+  + section root added
+  + section file added
+  + section exports added
+  + section internal added
+  + section feature added
+  + section feature_source added
+  + section change added
+  + section depth added
+  + section nodes added
+  + section id added
+  + section path added
+  + section symbol added
+  + section confidence added
+  + section risk added
+  + section order added
+  + section action added
+  + section via added
+  + section reason added
+  + section verify added
+  + section evidence added
+  + section impact added
+  + section ripples added
+  + section features added
+  + section Amu added
+  + section Tests added
+  + section radius added
+  + section files added
+  + section packages added
+  + section consumers added
+  + section tests added
+  + section resolution added
+  + section sound added
+  + section guessed added
+  + section unknown added
+  + section qualifier added
+  + section next added
+  + section map_hash added
+
+docs/evidence/12-delta-brief.json (JSON)
+  + section phase added
+  + section base added
+  + section changed_files added
+  + section violations added
+  + section kind added
+  + section symbol added
+  + section detail added
+  + section severity added
+  + section warnings added
+  + section tests added
+  + section passed added
+  + section delta_brief added
+  + section node added
+  + section consumers added
+  + section why added
+  + section verify added
+  + section next added
+  + section checker added
+  + section decision added
+  + section confidence added
+  + section escalate added
+  + section evidence added
+  + section task added
+  + section role added
+
+scripts/install.sh (Bash)
+  + module scripts/install.sh added
+
+tests/bin/entire (Bash)
+  + module tests/bin/entire added
+
+tests/fake_entire.py (Python)
+  + function main added
+
+tests/fixtures/diff.json (JSON)
+  + module tests/fixtures/diff.json added
+
+tests/fixtures/impact.json (JSON)
+  + module tests/fixtures/impact.json added
+
+tests/test_brand.py (Python)
+  + function _run added
+  + function test_header_on_stderr_for_human_output added
+  + function test_json_output_is_untouched_by_branding added
+  + function test_version_line added
+
+tests/test_cli_smoke.py (Python)
+  + function _run added
+  + function test_help_mentions_brand added
+  + function test_doctor_exit_3_with_install_hint_when_entire_missing added
+  + function test_doctor_never_prints_key_value added
+  + function test_map_requires_target added
+  + function test_map_with_fake_entire added
+
+tests/test_contract_phase.py (Python)
+  + function test_phase_drift_when_later_phase_file_changes added
+  + function test_frozen_signature_blocks added
+  + function test_unknown_touched_is_a_warning_not_a_block added
+  + function test_out_of_scope_blocks added
+  + function test_real_diff_shape_parses added
+
+tests/test_docs.py (Python)
+  + function test_signature_change_on_mapped_export_is_suggested_draft added
+  + function test_body_change_is_unknown_candidate added
+  + function test_unmapped_is_guessed_flag_only added
+  + function test_auto_never_applies_unknown added
+
+tests/test_done.py (Python)
+  + function _amu added
+  + function test_sweep_reports_findings_outside_contract_with_verify added
+  + function test_sweep_never_exits_1_and_reports_depth added
+  + function test_done_exits_0_with_findings added
+
+tests/test_honesty.py (Python)
+  + function _m added
+  + function test_map_plan_contract_json_have_no_banned_verdict_words added
+  + function test_rendered_map_has_no_banned_words added
+  + function test_schemas_validate added
+
+tests/test_map.py (Python)
+  + function _map added
+  + function test_sound_needs_resolved_edge added
+  + function test_every_non_sound_node_has_reason_and_verify added
+  + function test_failed_impact_is_unknown_not_dropped added
+  + function test_partial_parse_file_becomes_unknown_node added
+  + function test_zero_unknown_line_carries_qualifier added
+  + function test_body_change_never_will_break added
+  + function test_next_is_runnable added
+
+tests/test_memory.py (Python)
+  + function _repo added
+  + function test_markers_created_once_and_replaced_in_place added
+  + function test_human_text_outside_markers_is_byte_identical added
+  + function test_stale_flips_when_cited_file_hash_changes added
+  + function test_caps_enforced_with_overflow_note added
+  + function test_secret_pattern_rejected added
+  + function test_no_change_no_write added
+  + function test_show_entries_validate_schema added
+
+tests/test_roles.py (Python)
+  + function test_role_cannot_call_ungranted_tool added
+  + function test_builder_write_guard added
+  + function test_checker_cannot_downgrade_blocking added
+  + function test_third_retry_escalates added
+
+tests/test_router.py (Python)
+  + function test_never_invents_a_symbol added
+  + function test_silent_on_params_means_signature added
+  + function test_two_targets_is_multi_target added
+  + function test_duplicate_name_is_ambiguous added
+  + function test_slash_commands added
+
+Warnings
+  ! W_UNSUPPORTED_FILE amu/__pycache__/__init__.cpython-313.pyc
+    file skipped; no parser for this file type, so its changes are not analyzed
+    base and head versions have no supported parser
+  ! W_UNSUPPORTED_FILE amu/__pycache__/classify.cpython-313.pyc
+    file skipped; no parser for this file type, so its changes are not analyzed
+    base and head versions have no supported parser
+  ! W_UNSUPPORTED_FILE amu/__pycache__/contract.cpython-313.pyc
+    file skipped; no parser for this file type, so its changes are not analyzed
+    base and head versions have no supported parser
+  ! W_UNSUPPORTED_FILE amu/__pycache__/plan.cpython-313.pyc
+    file skipped; no parser for this file type, so its changes are not analyzed
+    base and head versions have no supported parser
+  ! W_UNSUPPORTED_FILE docs/evidence/checkpoint-diagnostic.txt
+    file skipped; no parser for this file type, so its changes are not analyzed
+    head version has no supported parser
+  ! W_UNSUPPORTED_FILE docs/evidence/checkpoints.jsonl
+    file skipped; no parser for this file type, so its changes are not analyzed
+    head version has no supported parser
+  ! W_UNSUPPORTED_FILE tests/fixtures/symbols.ndjson
+    file skipped; no parser for this file type, so its changes are not analyzed
+    head version has no supported parser
+  ! W_MOVE_AMBIGUOUS BUILDATHON.md
+    symbol move could not be reconciled unambiguously; reported as remove/add
+    code_fence code_fence_2_text has multiple equally similar destinations
+  ! W_MOVE_AMBIGUOUS BUILDATHON.md
+    symbol move could not be reconciled unambiguously; reported as remove/add
+    code_fence code_fence_4_text has multiple equally similar destinations
+  ! W_MOVE_AMBIGUOUS BUILDATHON.md
+    symbol move could not be reconciled unambiguously; reported as remove/add
+    code_fence code_fence_5_text has multiple equally similar destinations
+  ! W_MOVE_AMBIGUOUS BUILDATHON.md
+    symbol move could not be reconciled unambiguously; reported as remove/add
+    code_fence code_fence_6_text has multiple equally similar destinations
+  ! W_MOVE_AMBIGUOUS BUILDATHON.md
+    symbol move could not be reconciled unambiguously; reported as remove/add
+    code_fence code_fence_7_text has multiple equally similar destinations
+  ! W_MOVE_AMBIGUOUS BUILDATHON.md
+    symbol move could not be reconciled unambiguously; reported as remove/add
+    code_fence code_fence_8_text has multiple equally similar destinations
+  ! W_MOVE_AMBIGUOUS BUILDATHON.md
+    symbol move could not be reconciled unambiguously; reported as remove/add
+    code_fence code_fence_10_text has multiple equally similar destinations
+  ! W_MOVE_AMBIGUOUS BUILDATHON.md
+    symbol move could not be reconciled unambiguously; reported as remove/add
+    code_fence code_fence_12_text has multiple equally similar destinations
+  ! W_MOVE_AMBIGUOUS BUILDATHON.md
+    symbol move could not be reconciled unambiguously; reported as remove/add
+    code_fence code_fence_14_text has multiple equally similar destinations
+  ! W_MOVE_AMBIGUOUS BUILDATHON.md
+    symbol move could not be reconciled unambiguously; reported as remove/add
+    code_fence code_fence_16_text has multiple equally similar destinations
+  ! W_MOVE_AMBIGUOUS BUILDATHON.md
+    symbol move could not be reconciled unambiguously; reported as remove/add
+    code_fence code_fence_18_text has multiple equally similar destinations
+  ! W_MOVE_AMBIGUOUS BUILDATHON.md
+    symbol move could not be reconciled unambiguously; reported as remove/add
+    code_fence code_fence_19_text has multiple equally similar destinations
+  ! W_MOVE_AMBIGUOUS BUILDATHON.md
+    symbol move could not be reconciled unambiguously; reported as remove/add
+    code_fence code_fence_20_text has multiple equally similar destinations
+  ! W_MOVE_AMBIGUOUS BUILDATHON.md
+    symbol move could not be reconciled unambiguously; reported as remove/add
+    code_fence code_fence_22_text has multiple equally similar destinations
+  ! W_MOVE_AMBIGUOUS README.md
+    symbol move could not be reconciled unambiguously; reported as remove/add
+    section Commands has multiple equally similar destinations
