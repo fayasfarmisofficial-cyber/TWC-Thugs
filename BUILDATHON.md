@@ -2,7 +2,7 @@
 
 Track: Entire main challenge · Track 2 Graph Intelligence
 Fork/repo: https://github.com/fayasfarmisofficial-cyber/TWC-Thugs
-Final commit SHA: see `git rev-parse HEAD` on main (recorded below after the final push)
+Final commit SHA: the commit after cc1c73b titled `chore(p8): buildathon submission` (`git rev-parse HEAD` on main)
 Project URL (Vercel): not deployed — the CLI runs locally next to the repo (Phase 7 web page was cut for time; the MCP server `amu/mcp_server.py` and `scripts/install.sh` are in place).
 Demo: docs/DEMO.md · recorded outputs in docs/evidence/
 
@@ -34,9 +34,9 @@ Run tests: `pytest -q` (118 tests; the suite hides the real `entire` and replays
 | Checkpoint | Commit | Checkpoint ID | Link | Proves |
 |---|---|---|---|---|
 | init-understanding | 34f6324 | none listed by `entire checkpoint list` (see note) | — | graph-first read before edits: docs/evidence/00–03 |
-| pre-curveball-stable | (this commit's parent) | none listed (see note) | — | loop closes end-to-end, 118 tests green |
+| pre-curveball-stable | cc1c73b | none listed (see note) | — | loop closes end-to-end, 118 tests green |
 | curveball-response | — | — | — | not reached before the 15:00 deadline |
-| final-verification | — | — | — | not reached |
+| final-verification | chore(p8) commit on main | none listed (see note) | — | clean-checkout rehearsal in /tmp: clone → pip install -e . → 118 passed → amu init → amu map (docs/evidence/20-final-semantic-diff.txt) |
 
 **Note (honest):** `entire enable --agent claude-code` was run at 14:12 IST *inside* an already-running Claude Code session.
 `entire doctor` reports hooks OK, but `entire checkpoint list --json` returned `[]` at every protocol run
