@@ -30,7 +30,7 @@ Semantic changes 34f6324..HEAD
   + section run-tests added
 
 AGENTS.md (Markdown)
-  + section What-amu-has-learned-about-this-repo-TWC-Thugs-updated-2026-09-06T08:56:57Z-checkpoint-none-yet added
+  + section What-amu-has-learned-about-this-repo-TWC-Thugs-updated-2026-09-06T08:59:21Z-checkpoint-none-yet added
   + section Hot-spots-history:-went-red-in-past-checks added
   + section Frozen-/-risky-interfaces-from-approved-contracts added
   + section Features-paths added
@@ -42,7 +42,7 @@ BUILDATHON.md (Markdown)
   + section amu-Anti-Messup-BUILDATHON-TWC-Thugs added
   - section 1.-Problem-Track-2-Fit removed (0 dependents)
   - section The-Problem-Silent-AI-Agent-Breakage removed (0 dependents)
-  + section Environment added
+  ~ section Environment renamed from Installation (0 dependents)
   + section Problem-and-innovation added
   - section Track-2-Fit-entire-graph-at-the-Core removed (0 dependents)
   + section Setup-/-Run-clean-checkout added
@@ -58,7 +58,7 @@ BUILDATHON.md (Markdown)
   + section Tests added
   - code_fence code_fence_3_python removed (0 dependents)
   - code_fence code_fence_4_text removed (0 dependents)
-  ~ section Databricks renamed from Installation (0 dependents)
+  + section Databricks added
   - section 3.-Architecture-Overview removed (0 dependents)
   + section What-s-next added
   - code_fence code_fence_5_text removed (0 dependents)
@@ -102,7 +102,7 @@ BUILDATHON.md (Markdown)
   - section 6.-Why-amu-Wins-Track-2 removed (0 dependents)
 
 CLAUDE.md (Markdown)
-  + section What-amu-has-learned-about-this-repo-TWC-Thugs-updated-2026-09-06T08:56:57Z-checkpoint-none-yet added
+  + section What-amu-has-learned-about-this-repo-TWC-Thugs-updated-2026-09-06T08:59:21Z-checkpoint-none-yet added
   + section Hot-spots-history:-went-red-in-past-checks added
   + section Frozen-/-risky-interfaces-from-approved-contracts added
   + section Features-paths added
@@ -209,7 +209,7 @@ amu/entire.py (Python)
   + function status_text added
 
 amu/graph.py (Python)
-  ~ function impact body changed (18 dependents)
+  ~ function impact body changed (19 dependents)
   ~ function capabilities body changed (13 dependents)
 
 amu/harness/model.py (Python)
@@ -495,6 +495,22 @@ tests/test_router.py (Python)
   + function test_duplicate_name_is_ambiguous added
   + function test_slash_commands added
 
+web/public/card.html (HTML)
+  + document card added
+  + element in added
+  + element approve added
+  + element out added
+  + element raw added
+
+web/public/index.html (HTML)
+  + document index added
+
+web/public/install.sh (Bash)
+  + module web/public/install.sh added
+
+web/vercel.json (JSON)
+  + module web/vercel.json added
+
 Warnings
   ! W_UNSUPPORTED_FILE amu/__pycache__/__init__.cpython-313.pyc
     file skipped; no parser for this file type, so its changes are not analyzed
@@ -508,10 +524,34 @@ Warnings
   ! W_UNSUPPORTED_FILE amu/__pycache__/plan.cpython-313.pyc
     file skipped; no parser for this file type, so its changes are not analyzed
     base and head versions have no supported parser
+  ! W_UNSUPPORTED_FILE docs/evidence/20-final-semantic-diff.txt
+    file skipped; no parser for this file type, so its changes are not analyzed
+    head version has no supported parser
   ! W_UNSUPPORTED_FILE docs/evidence/checkpoint-diagnostic.txt
     file skipped; no parser for this file type, so its changes are not analyzed
     head version has no supported parser
   ! W_UNSUPPORTED_FILE docs/evidence/checkpoints.jsonl
+    file skipped; no parser for this file type, so its changes are not analyzed
+    head version has no supported parser
+  ! W_UNSUPPORTED_FILE docs/screenshots/01-map.txt
+    file skipped; no parser for this file type, so its changes are not analyzed
+    head version has no supported parser
+  ! W_UNSUPPORTED_FILE docs/screenshots/02-plan-approve.txt
+    file skipped; no parser for this file type, so its changes are not analyzed
+    head version has no supported parser
+  ! W_UNSUPPORTED_FILE docs/screenshots/03-check-phase1.txt
+    file skipped; no parser for this file type, so its changes are not analyzed
+    head version has no supported parser
+  ! W_UNSUPPORTED_FILE docs/screenshots/04-sweep.txt
+    file skipped; no parser for this file type, so its changes are not analyzed
+    head version has no supported parser
+  ! W_UNSUPPORTED_FILE docs/screenshots/05-docs.txt
+    file skipped; no parser for this file type, so its changes are not analyzed
+    head version has no supported parser
+  ! W_UNSUPPORTED_FILE docs/screenshots/06-memory-show.txt
+    file skipped; no parser for this file type, so its changes are not analyzed
+    head version has no supported parser
+  ! W_UNSUPPORTED_FILE docs/screenshots/07-entire-amu-doctor.txt
     file skipped; no parser for this file type, so its changes are not analyzed
     head version has no supported parser
   ! W_UNSUPPORTED_FILE tests/fixtures/symbols.ndjson
