@@ -28,7 +28,7 @@ outside the markers is byte-identical after a refresh (tested).
     amu plan --targets amu/classify.py#classify_consumers:signature --approve
     amu check --phase 1
     amu done
-Run tests: `pytest -q` (167 tests; the suite hides the real `entire`, isolates `~/.amu` via `AMU_HOME`, and replays fixtures via `tests/fake_entire.py`).
+Run tests: `pytest -q` (173 tests; the suite hides the real `entire`, isolates `~/.amu` via `AMU_HOME`, and replays fixtures via `tests/fake_entire.py`).
 
 ## Entire Checkpoints
 | Checkpoint | Commit | Checkpoint ID | Link | Proves |
@@ -74,7 +74,7 @@ editing a phase-3 file (`numpy/lib/_polynomial_impl.py`) → PHASE_DRIFT + delta
 - **Workspace + navigation** (`amu/workspace.py`): `amu repo add <path|owner/repo|url> | list | use | remove | sync`, `amu cd`; `find` (ranked hits with `signals[]`), `open`, `tree`, `neighbors`, `where`, `back`/`recent`. Repo resolution: `--repo` → repo containing `$PWD` → active → exit 2 with the add hint.
 - **Live graph rendering**: `amu graph <path#sym>` ASCII / `--format json|dot|mermaid` (deterministic; an ambiguous name lists its candidates with the exact command instead of guessing), `amu watch` (node states `· ▸ ✓ ✗ ↯` from `.amu/state.json`, never runs tests), Rich `Live` tree in `check`, spinner that names the relation and count, `web/public/graph.html` d3-force viewer.
 - **Gold identity** (`amu/brand.py`): five tokens, confidence colours semantic and never gold, `NO_COLOR` reads identically, nothing branded reaches `--json`.
-- **Bring your own model** (`amu/keys.py`, `amu/harness/providers.py`, `amu/harness/chat.py`): `amu key set [--provider anthropic|bedrock|vertex|foundry|openai-compatible|ollama|lmstudio|openrouter]` (0600 file, env, or `ant auth login`; value never printed); `amu ask` and REPL free text run a tool-using loop over **read-only** graph tools (`graph_search`, `graph_def`, `amu_map`, `amu_graph`, `amu_where`, `amu_state`, `read_lines` labelled heuristic, `answer_unknown`). The assistant role has no write tool; it can widen a map or ask, never enlarge a contract or promote confidence. Default model `claude-opus-5`; OpenAI-compatible endpoints get the same loop through a `/v1/chat/completions` adapter.
+- **Bring your own model** (`amu/keys.py`, `amu/harness/providers.py`, `amu/harness/chat.py`): `amu key set [--provider anthropic|bedrock|vertex|foundry|openai-compatible|ollama|lmstudio|openrouter]` (0600 file, env, or `ant auth login`; value never printed); the REPL banner shows `● model on` / `○ model off` with a guided in-session `/key add`; `amu ask` and REPL free text run a tool-using loop over **read-only** graph tools (`graph_search`, `graph_def`, `amu_map`, `amu_graph`, `amu_where`, `amu_state`, `read_lines` labelled heuristic, `answer_unknown`). The assistant role has no write tool; it can widen a map or ask, never enlarge a contract or promote confidence. Default model `claude-opus-5`; OpenAI-compatible endpoints get the same loop through a `/v1/chat/completions` adapter.
 - **Numpy dogfood** (docs/TESTCASE-NUMPY.md): three real bugs found and fixed on numpy/numpy (null `entries`, silent 0 consumers on an ambiguous symbol, 323 parse failures as nodes); per-symbol impact 80 s → 1 s with `--head`.
 
 ## How amu builds on the Entire CLI (not beside it)

@@ -13,11 +13,13 @@ amu map --file amu/classify.py       # sound / guessed / unknown nodes, each wit
 amu plan --targets amu/classify.py#classify_consumers:signature --approve
 amu check --phase 1                  # exit 1 on a blocking violation, with a delta brief
 amu done                             # sync → sweep → docs → memory refresh → report
-pytest -q                            # 118 tests, no real `entire` needed (tests/fake_entire.py)
+pytest -q                            # 173 tests, no real `entire` needed (tests/fake_entire.py)
 ```
 
 `entire amu map --file amu/plan.py` works the same way: the `entire-amu` entrypoint is dispatched by the Entire CLI.
-Interactive: `amu` (no args) opens the TWC Thugs REPL (gold identity, tab-completion for repos and symbols) — `/map /plan /approve /check N /done /docs /verify nX /why nX /feature X /skills /repo /use <name> /find <words> /open <sym> /tree [path] /graph <sym> /back /ask <question> /key`; a bare path or symbol is an `explore`; with a credential, any other free text goes to the model, which answers through the graph tools and proposes the next amu command.
+Interactive: `amu` (no args) opens the TWC Thugs REPL (gold identity, tab-completion for repos and symbols) — `/map /plan /approve /check N /done /docs /verify nX /why nX /feature X /skills /repo /use <name> /find <words> /open <sym> /tree [path] /graph <sym> /back /ask <question> /key [add|remove]`; a bare path or symbol is an `explore`; with a model connected, any other free text goes to the model, which answers through the graph tools and proposes the next amu command.
+
+The banner tells you whether a model is connected — `● model on · anthropic · claude-opus-5 · via file` or `○ model off · no API key added · type /key add`. `/key add` is a guided, in-session setup (pick a provider, enter only what it needs; keys are hidden and stored 0600); `/key remove` forgets it. Everything except free-text questions works with the model off.
 
 Web (Vercel, static): `web/public` — `/` install page, `/card` agent-card viewer for `amu map --json`, `/graph` d3-force viewer for `amu graph --format json`. Same five gold tokens as the terminal. Import the repo with root dir `web/`.
 
