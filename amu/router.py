@@ -15,7 +15,7 @@ CLASS_RULES = [
 ]
 SLASH = {"/map": "map", "/plan": "plan", "/approve": "approve", "/check": "check", "/done": "done", "/docs": "docs",
          "/verify": "verify", "/why": "why", "/feature": "feature", "/skills": "skills", "/help": "help",
-         "/repo": "repo", "/use": "use", "/find": "find", "/open": "open", "/tree": "tree", "/back": "back", "/graph": "graph", "/ask": "ask", "/key": "key"}
+         "/repo": "repo", "/use": "use", "/find": "find", "/open": "open", "/tree": "tree", "/back": "back", "/graph": "graph", "/ask": "ask", "/key": "key", "/cat": "cat", "/where": "where", "/recent": "recent", "/neighbors": "neighbors", "/quit": "quit"}
 _EXPLORE_RX = re.compile(r"^[A-Za-z0-9_./#-]+$")
 
 
@@ -35,13 +35,20 @@ def candidate_tokens(text: str) -> list[str]:
     return [t for t in toks if t.lower() not in stop and len(t) > 2]
 
 
+VERBS = {"open", "cat", "find", "search", "tree", "ls", "graph", "map", "where", "neighbors", "plan", "approve", "check", "done", "docs",
+         "verify", "why", "feature", "skills", "repo", "use", "back", "recent", "ask", "key", "help", "quit", "exit"}
+_ALIAS = {"search": "find", "ls": "tree", "quit": "quit", "exit": "quit"}
+
+
 def route(text: str, lookup: Callable[[str], list[dict]]) -> dict:
     """lookup(token) → list of {symbol, path} matches from the graph (verbatim). Returns
-    {intent, change_class, targets[], status ∈ ok|not_found|ambiguous|multi_target|command}."""
+    {intent, change_class, targets[], status ∈ ok|not_found|ambiguous|multi_target|command|explore}."""
     text = text.strip()
-    if text.startswith("/"):
-        cmd, _, arg = text.partition(" ")
-        return {"intent": SLASH.get(cmd, "unknown"), "arg": arg.strip(), "status": "command", "targets": [], "change_class": None}
+    head, _, rest = text.partition(" ")
+    if text.startswith("/") or head.lower() in VERBS:
+        cmd = head.lstrip("/").lower()
+        cmd = _ALIAS.get(cmd, cmd)
+        return {"intent": SLASH.get("/" + cmd, cmd if cmd in VERBS or cmd in ("cat",) else "unknown"), "arg": rest.strip(), "status": "command", "targets": [], "change_class": None}
     if " " not in text and _EXPLORE_RX.match(text) and ("/" in text or "#" in text or "." in text):
         return {"intent": "explore", "arg": text, "status": "explore", "targets": [], "change_class": None}
     cls = change_class(text)

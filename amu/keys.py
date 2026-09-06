@@ -67,6 +67,8 @@ def set_credential(provider: str = "anthropic", api_key: str | None = None, base
         raise ValueError(f"provider {provider} needs --base-url")
     if family == "openai" and not (model or default_model):
         raise ValueError(f"provider {provider} needs --model")
+    if provider == "openrouter" and "/" not in (model or ""):
+        raise ValueError("openrouter models are namespaced, e.g. anthropic/claude-opus-5 or openai/gpt-4o — see openrouter.ai/models")
     rec = {"provider": provider, "family": family, "api_key": api_key, "base_url": base_url or default_url, "model": model or default_model,
            "region": region, "project_id": project_id, "resource": resource}
     return _write({k: v for k, v in rec.items() if v is not None})

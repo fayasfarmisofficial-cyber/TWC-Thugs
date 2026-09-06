@@ -8,7 +8,7 @@ import sys
 
 
 def _cli(*args: str) -> str:
-    r = subprocess.run([sys.executable, "-m", "amu.cli", *args, "--json"], capture_output=True, text=True)
+    r = subprocess.run([sys.executable, "-I", "-m", "amu.cli", *args, "--json"], capture_output=True, text=True)
     return r.stdout or json.dumps({"error": r.stderr[-500:], "exit": r.returncode})
 
 

@@ -25,7 +25,7 @@ ASSISTANT_SYSTEM = PREAMBLE.replace(
 
 
 def _cli(repo: str, *args: str) -> str:
-    r = subprocess.run([sys.executable, "-m", "amu.cli", *args, "--json", "--repo", repo], capture_output=True, text=True, timeout=600)
+    r = subprocess.run([sys.executable, "-I", "-m", "amu.cli", *args, "--json", "--repo", repo], capture_output=True, text=True, timeout=600)
     return r.stdout if r.stdout.strip() else json.dumps({"error": r.stderr[-800:], "exit": r.returncode})
 
 
@@ -133,6 +133,11 @@ class Assistant:
                     self.out(ev.delta.text)
             return s.get_final_message()
 
+    def _fail(self, text: str) -> str:
+        self.messages = [m for m in self.messages if m["role"] != "user" or not isinstance(m["content"], str) or not m["content"].startswith("<context>")] and self.messages[:-1]
+        self.out(f"✗ {text}\n")
+        return text
+
     def ask(self, text: str, max_turns: int = 8) -> str:
         if not modelmod.available():
             return "manual mode: no credential — run `amu key set [--provider …]` (or export ANTHROPIC_API_KEY / OPENAI_BASE_URL) to make the session interactive"
@@ -147,9 +152,11 @@ class Assistant:
             try:
                 msg = self._call(client, tools)
             except anthropic.AuthenticationError:
-                return "credential rejected — run `amu key set` again"
+                return self._fail("credential rejected (401) — the key is wrong or revoked: type /key add to replace it")
             except (anthropic.APIStatusError, anthropic.APIConnectionError, providers.ProviderError) as exc:
-                return f"model call failed: {type(exc).__name__}: {str(exc)[:200]}"
+                msg = str(exc)[:240]
+                hint = " — the key was rejected: /key add to replace it" if "401" in msg else (" — check the model id: /key add" if "404" in msg or "400" in msg else " — endpoint unreachable?")
+                return self._fail(f"model call failed: {type(exc).__name__}: {msg}{hint}")
             self.messages.append({"role": "assistant", "content": msg.content})
             text_out = "".join(b.text for b in msg.content if b.type == "text")
             final = text_out or final

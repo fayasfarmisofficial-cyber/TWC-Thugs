@@ -25,3 +25,10 @@ def test_duplicate_name_is_ambiguous():
 
 def test_slash_commands():
     assert route("/verify n5", lookup) == {"intent": "verify", "arg": "n5", "status": "command", "targets": [], "change_class": None}
+
+
+def test_bare_verbs_are_commands():
+    assert route("open amu/plan.py", lookup) == {"intent": "open", "arg": "amu/plan.py", "status": "command", "targets": [], "change_class": None}
+    assert route("find where is the classifier", lookup)["intent"] == "find"
+    assert route("cat amu/plan.py 1 20", lookup)["intent"] == "cat"
+    assert route("rename classify_consumers", lookup)["status"] == "ok"  # still a change request

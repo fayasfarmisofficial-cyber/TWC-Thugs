@@ -597,7 +597,9 @@ def open_cmd(target: str, repo: str = REPO_OPT, json_output: bool = JSON_OPT):
         if not json_output:
             for x in out["symbols"]:
                 typer.echo(f"  {x['line']:>5}  {x['kind']:<9} {x['signature'] or x['name']}")
-            typer.echo(f"next       {out['next']}")
+            if not out["symbols"]:
+                typer.echo("  (no exported symbols in the graph for this file)")
+            typer.echo(f"read       /cat {target} 1 80   ·   next       {out['next']}")
         return
     name = target.split("#")[-1]
     text = entire.definition(repo, name)
@@ -901,6 +903,21 @@ _PROVIDER_MENU = [
 ]
 
 
+
+PALETTE_ROWS = [
+    ("explore", "/find <words> · /open <file|sym> · /cat <file> [start] [end] · /tree [path] · /where <sym> · /graph <sym> · /back"),
+    ("guard",   "/map <file> · /plan · /approve · /check N · /verify nX · /why nX · /done · /docs"),
+    ("session", "/repo · /use <name> · /key [add|remove] · /skills · /help · /quit   — slash optional: `open amu/plan.py` works too"),
+    ("talk",    "a change request (\"rename classify_consumers\") maps it; any other sentence goes to the model when ● on"),
+]
+
+
+def print_palette() -> None:
+    from rich.markup import escape
+    c = brand.err_console()
+    for label, row in PALETTE_ROWS:
+        c.print(f"  [brand.label]{label:<8}[/] [brand.body]{escape(row)}[/]")
+
 def model_status_line() -> str:
     """One line for the banner: ● on with provider/model, or ○ off with the two-step guide."""
     if keys.available():
@@ -994,7 +1011,25 @@ def _repl(repo: str | None = None):
     from amu.harness.chat import Assistant
     assistant = Assistant(repo) if keys.available() else None
     brand.err_console().print(model_status_line())
+    print_palette()
     lookup = _lookup_factory(repo)
+
+    def _cat(arg: str):
+        parts = arg.split()
+        if not parts:
+            typer.echo("usage: /cat <file> [start] [end]")
+            return
+        p = Path(repo, parts[0])
+        if not p.is_file():
+            typer.echo(f"no such file: {parts[0]} — try /tree or /find")
+            return
+        lines = p.read_text(errors="ignore").splitlines()
+        start = int(parts[1]) if len(parts) > 1 else 1
+        end = int(parts[2]) if len(parts) > 2 else min(len(lines), start + 79)
+        for i in range(max(1, start), min(len(lines), end) + 1):
+            typer.echo(f"{i:>5}  {lines[i - 1]}")
+        if end < len(lines):
+            typer.echo(f"… {len(lines) - end} more lines · /cat {parts[0]} {end + 1} {end + 80}")
 
     def _key_cmd(arg: str):
         nonlocal assistant
@@ -1016,6 +1051,7 @@ def _repl(repo: str | None = None):
             typer.echo("")
             return
         if not line.strip():
+            print_palette()
             continue
         r = router.route(line, lookup)
         if r["status"] == "command":
@@ -1039,12 +1075,22 @@ def _repl(repo: str | None = None):
                     "graph": lambda: graph(arg, depth=2, relation=None, fmt="text", repo=repo, json_output=False),
                     "ask": lambda: (typer.echo(assistant.ask(arg)) if not assistant or not arg else (assistant.ask(arg), typer.echo(""))),
                     "key": lambda: _key_cmd(arg),
-                    "help": lambda: typer.echo("/map <file> /plan /approve /check N /done /docs /verify nX /why nX /feature X /skills /repo /use <name> /find <words> /open <sym> /tree [path] /graph <sym> /back /ask <question> /key [add|remove] — or just talk: a change request maps it, anything else goes to the model")}
+                    "cat": lambda: _cat(arg),
+                    "where": lambda: where(arg, repo=repo, json_output=False),
+                    "recent": lambda: recent(repo=repo, json_output=False),
+                    "neighbors": lambda: neighbors(arg, relation="CALLS", direction="in", repo=repo, json_output=False),
+                    "quit": lambda: (_ for _ in ()).throw(EOFError()),
+                    "help": print_palette}
             try:
+                if r["intent"] not in cmds:
+                    typer.echo(f"unknown command /{r['intent']} — here is what works:")
                 cmds.get(r["intent"], cmds["help"])()
                 if r["intent"] == "use" and workspace.get(arg):
                     repo = workspace.get(arg)["path"]
                     lookup = _lookup_factory(repo)
+            except EOFError:
+                typer.echo("")
+                return
             except typer.Exit:
                 pass
             continue

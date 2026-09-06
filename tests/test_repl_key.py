@@ -42,3 +42,31 @@ def test_banner_shows_model_on_when_env_key_present(fake_entire, tmp_path):
 def test_key_remove_turns_model_off(fake_entire, tmp_path):
     r = _repl("/key add\n2\nm\n/key remove\n", _repo(tmp_path))
     assert r.stderr.count("● model on") >= 1 and "○ model off" in r.stderr.split("● model on")[-1]
+
+
+def test_palette_visible_on_launch_and_on_empty_enter(fake_entire, tmp_path):
+    r = _repl("\n", _repo(tmp_path))
+    assert r.stderr.count("/cat <file>") >= 2 and "/key [add|remove]" in r.stderr
+
+
+def test_bare_open_is_a_command_not_a_change(fake_entire, tmp_path):
+    (tmp_path / "src").mkdir()
+    (tmp_path / "src" / "plan.py").write_text("x = 1\ny = 2\n")
+    r = _repl("open src/plan.py\ncat src/plan.py 1 2\n", _repo(tmp_path))
+    assert "amu plan --targets" not in r.stdout and "/cat src/plan.py" in r.stdout and "    2  y = 2" in r.stdout
+
+
+def test_model_error_is_shown_in_repl(fake_entire, tmp_path, monkeypatch):
+    from amu import keys
+    keys.set_credential("openai-compatible", base_url="http://127.0.0.1:9/v1", model="m")
+    r = _repl("what does this repo do\n", _repo(tmp_path))
+    assert "✗ model call failed" in r.stdout + r.stderr and "unreachable" in r.stdout + r.stderr
+
+
+def test_openrouter_model_must_be_namespaced():
+    import pytest
+
+    from amu import keys
+    with pytest.raises(ValueError):
+        keys.set_credential("openrouter", api_key="k", model="openai")
+    keys.set_credential("openrouter", api_key="k", model="openai/gpt-4o")
