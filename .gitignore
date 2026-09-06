@@ -13,3 +13,4 @@ build/
 !.amu/feature_map.json
 !.amu/skills/
 .ruff_cache/
+_nobin/
