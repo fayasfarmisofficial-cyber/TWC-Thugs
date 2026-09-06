@@ -134,7 +134,7 @@ def _do_map(repo: str, file: str | None, symbol: str | None, depth: int, change:
         names = [s.get("qualified_name") or s["name"] for s in entire.symbols(repo)
                  if s.get("record_type", "symbol") == "symbol" and s.get("file_path") == file and s.get("kind") in ("function", "class")
                  and not s.get("name", "_").startswith("_")]
-    impacts = {n: entire.impact_json(repo, n, depth) for n in names}
+    impacts = {n: entire.impact_json(repo, n, depth, file=(root_file if root_file != "?" else None)) for n in names}
     if symbol and root_file == "?":
         f = impacts[names[0]].get("focus", {}).get("file_path")
         root_file = f or "?"

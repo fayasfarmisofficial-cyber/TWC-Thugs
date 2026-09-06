@@ -79,9 +79,15 @@ def definition(repo: str, symbol: str) -> str:
     return out if rc == 0 else f"Error running def: {err}"
 
 
-def impact_json(repo: str, symbol: str, depth: int = 2, limit: int = 50) -> dict:
-    return _json(["graph", "impact", "--repo", repo, "--symbol", symbol, "--depth", str(depth),
-                  "--limit", str(limit), "--profile", "full", "--format", "json"])
+def impact_json(repo: str, symbol: str, depth: int = 2, limit: int = 50, file: str | None = None, head: bool = True) -> dict:
+    """`file` disambiguates a name defined in several files; `head` queries the cached committed tree (fast) —
+    a map is taken before editing, so the committed tree is the right baseline."""
+    args = ["graph", "impact", "--repo", repo, "--symbol", symbol, "--depth", str(depth), "--limit", str(limit), "--profile", "full", "--format", "json"]
+    if file:
+        args += ["--file", file]
+    if head:
+        args.append("--head")
+    return _json(args)
 
 
 def impact_text(repo: str, symbol: str, depth: int = 2) -> str:

@@ -28,10 +28,20 @@ def test_failed_impact_is_unknown_not_dropped():
     assert m["resolution"]["unknown"] == 1 and "unresolved" in m["nodes"][0]["reason"]
 
 
-def test_partial_parse_file_becomes_unknown_node():
-    imp = {**IMP, "partial_failures": [{"code": "E_MINIFIED", "file_path": "vendor/x.min.js", "effect_on_semantic_completeness": "skipped"}]}
+def test_syntax_error_file_in_root_package_becomes_unknown_node():
+    imp = {**IMP, "partial_failures": [{"code": "E_PARSE_ERROR", "file_path": "amu/broken.py", "effect_on_semantic_completeness": "incomplete"},
+                                       {"code": "E_UNSUPPORTED_LANGUAGE", "file_path": "doc/x.f90", "effect_on_semantic_completeness": "omitted"}]}
     m = _map(imp=imp)
-    assert any(n["confidence"] == "unknown" and n["path"] == "vendor/x.min.js" for n in m["nodes"])
+    assert any(n["confidence"] == "unknown" and n["path"] == "amu/broken.py" for n in m["nodes"])
+    assert not any(n["path"] == "doc/x.f90" for n in m["nodes"])
+    assert "2 files unparsed repo-wide" in m["resolution"]["qualifier"]
+
+
+def test_ambiguous_symbol_is_unknown_not_silent():
+    imp = {**IMP, "callers": {"total": 0, "entries": []}, "data_flows": {"total": 0, "entries": None},
+           "disambiguation_required": True, "definitions": [{"file_path": "a.py"}, {"file_path": "b.py"}]}
+    m = _map(imp=imp)
+    assert m["resolution"]["unknown"] == 1 and "ambiguous: 2 definitions" in m["nodes"][0]["reason"]
 
 
 def test_zero_unknown_line_carries_qualifier():

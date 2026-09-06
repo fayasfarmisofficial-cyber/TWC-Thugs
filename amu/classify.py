@@ -87,27 +87,39 @@ def build_map(root_file: str, root_symbols: list[str], impacts: dict[str, dict],
                 f"impact query failed: {imp.get('error', 'no data') if imp else 'no data'}", ["impact:error"], 99)
             continue
         for section in _EDGE_SECTIONS:
-            for e in (imp.get(section) or {}).get("entries", []):
-                ep = e.get("endpoint", {})
+            for e in (imp.get(section) or {}).get("entries") or []:
+                ep = e.get("endpoint") or {}
                 rel = e.get("relation", section.upper())
                 d = e.get("depth", 1)
                 risk = "will_break" if (breaking and d == 1) else "might_break"
                 site = e.get("call_site") or {}
                 via = f"{rel}:{site.get('file_path')}:{site.get('line')}" if site else f"{rel}:depth{d}"
-                add(ep.get("file_path", "?"), ep.get("qualified_name") or ep.get("name"), "sound", risk, via,
+                add(ep.get("file_path") or "(re-export, no file)", ep.get("qualified_name") or ep.get("name"), "sound", risk, via,
                     f"resolved {rel} edge at depth {d}", [f"impact:{section}"], d)
         for section in _GUESS_SECTIONS:
-            for e in (imp.get(section) or {}).get("entries", []):
-                ep = e.get("endpoint", e)
+            for e in (imp.get(section) or {}).get("entries") or []:
+                ep = e.get("endpoint") or e
                 path = ep.get("file_path") or e.get("file_path") or "?"
                 add(path, ep.get("name"), "guessed", "might_break", None,
                     f"{section.replace('_', '-')} only, no resolved edge", [f"impact:{section}"], 3)
+        if imp.get("disambiguation_required"):
+            defs = imp.get("definitions") or []
+            unresolved_sites += 1
+            add(root_file, sym, "unknown", "unknown", None,
+                f"ambiguous: {len(defs)} definitions of {sym} ({', '.join(d.get('file_path', '?') for d in defs[:3])}); no edges returned",
+                ["impact:disambiguation_required"], 99)
+        # Repo-wide parse failures are honesty context, not blast radius: only syntax-error files in the root's own
+        # package *and* language become unknown nodes (they could hide a caller); the rest are counted in the qualifier.
+        root_pkg = root_file.split("/")[0]
+        root_ext = root_file.rsplit(".", 1)[-1] if "." in root_file else ""
         for pf in imp.get("partial_failures", []) or []:
             fp = pf.get("file_path")
-            if fp and fp not in partial_files and not fp.startswith("docs/evidence"):
-                partial_files.append(fp)
+            if not fp or fp in partial_files or fp.startswith("docs/evidence"):
+                continue
+            partial_files.append(fp)
+            if pf.get("code") == "E_PARSE_ERROR" and fp.split("/")[0] == root_pkg and fp.rsplit(".", 1)[-1] == root_ext:
                 add(fp, None, "unknown", "unknown", None,
-                    f"{pf.get('code', 'partial parse')}: {pf.get('effect_on_semantic_completeness', 'not parsed')}",
+                    f"{pf.get('code')}: {pf.get('effect_on_semantic_completeness', 'not parsed')}",
                     ["impact:partial_failures"], 98)
     for pattern in (caps or {}).get("unresolved_patterns", []) or []:
         pass  # capability limits are reported in the qualifier, not invented as nodes
@@ -117,11 +129,12 @@ def build_map(root_file: str, root_symbols: list[str], impacts: dict[str, dict],
     for x in nodes:
         features[x["feature"]] = features.get(x["feature"], 0) + 1
     files = {x["path"] for x in nodes}
+    unparsed_note = f"{len(partial_files)} files unparsed repo-wide (not counted as nodes)" if partial_files else "0 files unparsed repo-wide"
     if counts["unknown"]:
-        qualifier = f"{unresolved_sites} unresolved impact queries, {len(partial_files)} partially parsed files"
+        qualifier = f"{unresolved_sites} unresolved impact queries, {counts['unknown'] - unresolved_sites} syntax-error files in {root_file.split('/')[0]}/; {unparsed_note}"
     else:
         qualifier = (f"graph reported 0 unresolved sites at depth {depth}; dynamic dispatch and files outside parser "
-                     f"coverage ({', '.join((caps or {}).get('out_of_coverage', [])[:3]) or 'none listed'}) are not counted")
+                     f"coverage ({', '.join(((caps or {}).get('out_of_coverage') or [])[:3]) or 'none listed'}) are not counted; {unparsed_note}")
     first_target = root_symbols[0] if root_symbols else root_file
     return {
         "root": {"file": root_file, "exports": len(root_symbols), "internal": 0,
